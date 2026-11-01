@@ -1,0 +1,11 @@
+{
+  "applicationId": "iSay",
+  "channel": "stable",
+  "architecture": "win-x64",
+  "manifestUrls": [],
+  "publicKeys": {},
+  "minimumSequence": 0,
+  "maximumPackageBytes": 536870912,
+  "maximumExpandedBytes": 2147483648,
+  "maximumFiles": 5000
+}

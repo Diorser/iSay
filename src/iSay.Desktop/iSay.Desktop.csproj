@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>iSay</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.10.1</Version>
+    <CompositionVersion>0.9.7</CompositionVersion>
+    <ApplicationIcon>Assets/iSay.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="CompositionVersion" Value="$(CompositionVersion)" />
+    <PackageReference Include="Interop.UIAutomationClient" Version="10.19041.0" />
+    <Resource Include="Assets/iSay.ico" />
+    <Resource Include="Assets/iSay.png" />
+    <Resource Include="Assets/托盘*.ico" />
+    <None Update="Assets/iSay.ico" Link="iSay.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <ProjectReference Include="../iSay.Voice/iSay.Voice.csproj" />
+    <ProjectReference Include="../iSay.Updates/iSay.Updates.csproj" />
+    <None Include="release.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <PackageReference Include="NAudio" Version="2.3.0" />
+  </ItemGroup>
+  <Target Name="PublishAudioRecovery" AfterTargets="Publish">
+    <Copy SourceFiles="$(PublishDir)iSay.exe" DestinationFiles="$(PublishDir)iSay.AudioRestore.exe" />
+  </Target>
+</Project>
+

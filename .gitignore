@@ -1,0 +1,46 @@
+bin/
+obj/
+.vs/
+
+# 本地构建产物、专有组件与研究证据不进入开源仓库。
+artifacts/
+external/
+--nologo/
+.wrangler/
+node_modules/
+__pycache__/
+*.pyc
+
+# 发布凭据通过环境变量或受控签名环境提供。
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+*.pfx
+*.p12
+*.key
+*.pem
+*.local.json
+
+# 测试源代码保留；录音、截图、日志和转储不默认公开。
+test/**/*.wav
+test/**/*.mp3
+test/**/*.log
+test/**/*.png
+test/**/*.gif
+test/**/*.dmp
+test/**/*.etl
+test/**/*.exe
+test/**/*.dll
+test/**/*.zip
+test/**/*.json
+test/**/*.jsonl
+test/**/*.csv
+test/**/*.txt
+test/**/.runtime/
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.tmp

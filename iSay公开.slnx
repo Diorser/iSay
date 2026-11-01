@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/iSay.Desktop/iSay.Desktop.csproj" />
+    <Project Path="src/iSay.Voice/iSay.Voice.csproj" />
+    <Project Path="src/iSay.Updates/iSay.Updates.csproj" />
+    <Project Path="src/iSay.Updater/iSay.Updater.csproj" />
+    <Project Path="src/iSay.ReleaseTool/iSay.ReleaseTool.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/客户端核心测试/客户端核心测试.csproj" />
+    <Project Path="test/配置恢复回归测试/配置恢复回归测试.csproj" />
+    <Project Path="test/更新安全回归/更新安全回归.csproj" />
+    <Project Path="test/发行发布预检回归/发行发布预检回归.csproj" />
+  </Folder>
+</Solution>

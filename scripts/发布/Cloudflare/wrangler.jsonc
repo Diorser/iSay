@@ -1,0 +1,7 @@
+{
+  "name": "isay-updates",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "r2_buckets": [{ "binding": "RELEASES", "bucket_name": "isay-releases" }]
+}

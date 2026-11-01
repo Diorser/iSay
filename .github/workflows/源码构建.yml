@@ -1,0 +1,46 @@
+name: 源码构建与回归
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 构建公开解决方案
+        run: dotnet build iSay公开.slnx -c Release --nologo
+      - name: 运行托管回归
+        shell: pwsh
+        run: |
+          foreach ($suite in @('客户端核心测试', '配置恢复回归测试', '更新安全回归', '发行发布预检回归')) {
+            dotnet run --project "test/$suite/$suite.csproj" -c Release --no-build
+            if ($LASTEXITCODE -ne 0) { throw "回归失败：$suite" }
+          }
+      - name: 检查更新文件服务
+        run: node test/发行打包回归/Worker回归.mjs
+      - name: 构建双架构输入组件
+        shell: pwsh
+        run: |
+          foreach ($arch in @('x64', 'Win32')) {
+            cmake -S src/iSay.TextService -B "artifacts/ci/TSF-$arch" -A $arch
+            if ($LASTEXITCODE -ne 0) { throw "配置失败：$arch" }
+            cmake --build "artifacts/ci/TSF-$arch" --config Release
+            if ($LASTEXITCODE -ne 0) { throw "构建失败：$arch" }
+          }
+          cmake -S src/iSay.TextService.Setup -B artifacts/ci/Setup -A x64
+          if ($LASTEXITCODE -ne 0) { throw '维护程序配置失败' }
+          cmake --build artifacts/ci/Setup --config Release
+          if ($LASTEXITCODE -ne 0) { throw '维护程序构建失败' }

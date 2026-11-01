@@ -1,0 +1,1484 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:local="clr-namespace:iSay.Desktop" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="iSay.Desktop.VoiceDeskWindow" Title="{local:L T001}" Icon="Assets/iSay.ico" Width="1100" Height="760" MinWidth="900" MinHeight="620" WindowStartupLocation="CenterScreen" Background="White" Foreground="#20272B" FontFamily="Microsoft YaHei UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/界面资源.xaml" />
+                <ResourceDictionary Source="Themes/整页滚动.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <local:HistoryPreviewConverter x:Key="HistoryPreview" />
+            <local:NotNullConverter x:Key="NotNull" />
+            <Style x:Key="HistoryCopyButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="MinWidth" Value="88" />
+                <Setter Property="MinHeight" Value="42" />
+                <Setter Property="Padding" Value="18,9" />
+                <Setter Property="Background" Value="{StaticResource AccentSoft}" />
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBorder}" />
+                <Setter Property="Foreground" Value="{StaticResource Accent}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+            <Style x:Key="HistoryMoreButton" TargetType="Button" BasedOn="{StaticResource TextButton}">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="Foreground" Value="{StaticResource Muted}" />
+                <Setter Property="MinHeight" Value="28" />
+                <Setter Property="MinWidth" Value="32" />
+                <Setter Property="Padding" Value="6,0" />
+            </Style>
+            <Style x:Key="HelpButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Width" Value="22" /><Setter Property="Height" Value="22" />
+                <Setter Property="MinWidth" Value="22" /><Setter Property="MinHeight" Value="22" />
+                <Setter Property="Padding" Value="0" /><Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="12" /><Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource Muted}" />
+                <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+                    <Border x:Name="Circle" CornerRadius="11" BorderBrush="{StaticResource AccentBorder}" BorderThickness="1" Background="White"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" /></Border>
+                    <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Circle" Property="Background" Value="{StaticResource AccentSoft}" /><Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Accent}" /></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Accent}" /></Trigger></ControlTemplate.Triggers>
+                </ControlTemplate></Setter.Value></Setter>
+            </Style>
+            <Style x:Key="VocabularyList" TargetType="ListBox">
+                <Setter Property="Background" Value="White" />
+                <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="MinHeight" Value="88" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBox">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="6" Padding="4">
+                                <ScrollViewer Focusable="False" CanContentScroll="True" Padding="0">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="10,7" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Row" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="#F0FAF6" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="{StaticResource AccentSoft}" />
+                                            </Trigger>
+                                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                                <Setter TargetName="Row" Property="BorderBrush" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Row" Property="BorderThickness" Value="1" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="TokenAction" TargetType="Button" BasedOn="{StaticResource TextButton}">
+                <Setter Property="Padding" Value="4,0" />
+                <Setter Property="MinWidth" Value="26" />
+                <Setter Property="MinHeight" Value="28" />
+                <Setter Property="Foreground" Value="#68776F" />
+                <Setter Property="FontSize" Value="15" />
+            </Style>
+            <Style x:Key="TokenList" TargetType="ListBox">
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <local:AdaptiveTokenPanel />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBox">
+                            <ItemsPresenter Margin="0,2,0,0" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="12,5,6,5" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Token" Background="#F7FCFA" BorderBrush="#D9E9E3" BorderThickness="1" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Token" Property="Background" Value="{StaticResource AccentSoft}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Token" Property="Background" Value="{StaticResource AccentSoft}" />
+                                                <Setter TargetName="Token" Property="BorderBrush" Value="{StaticResource Accent}" />
+                                            </Trigger>
+                                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                                <Setter TargetName="Token" Property="BorderBrush" Value="{StaticResource Accent}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <DataTemplate x:Key="WordToken">
+                <Grid ToolTip="{Binding Word}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.ContextMenu>
+                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="{local:L T002}" Tag="edit" Click="OnWordMenuClick" />
+                            <MenuItem Header="{local:L T003}" Tag="speak" Click="OnWordMenuClick" />
+                            <MenuItem Header="{local:L T004}" Tag="prefer" Click="OnWordMenuClick" />
+                            <Separator />
+                            <MenuItem Header="{local:L T005}" Tag="delete" Click="OnWordMenuClick" />
+                        </ContextMenu>
+                    </Grid.ContextMenu>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                        <DockPanel LastChildFill="True">
+                            <TextBlock Text="★" Foreground="{StaticResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0" Visibility="{Binding Preferred, Converter={StaticResource BooleanVisibility}}" DockPanel.Dock="Left" />
+                            <TextBlock Text="{Binding Word}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0" />
+                        </DockPanel>
+                    </StackPanel>
+                    <Button Content="×" Style="{StaticResource TokenAction}" ToolTip="{local:L T006}" AutomationProperties.Name="{local:L T005}" Click="OnWordDeleteClick" Grid.Column="1" VerticalAlignment="Center" />
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="LearnedToken">
+                <Grid ToolTip="{Binding Detail}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.ContextMenu>
+                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="{Binding KeepLabel}" Tag="keep" Click="OnLearningMenuClick" />
+                            <MenuItem Header="{local:L T003}" Tag="speak" Click="OnLearningMenuClick" />
+                            <MenuItem Tag="toggle" Click="OnLearningMenuClick">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Header" Value="{local:L T007}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Origin}" Value="ignored">
+                                                <Setter Property="Header" Value="{local:L T008}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Origin}" Value="keyboard">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Grid.ContextMenu>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                        <DockPanel LastChildFill="True">
+                            <TextBlock Text="✓" Foreground="{StaticResource Accent}" VerticalAlignment="Center" Margin="4,0,0,0" Visibility="{Binding IsSaved, Converter={StaticResource BooleanVisibility}}" ToolTip="{local:L T009}" DockPanel.Dock="Right" />
+                            <TextBlock Text="{Binding Word}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0" />
+                        </DockPanel>
+                    </StackPanel>
+                    <TextBlock Text="{Binding FrequencyLabel}" Grid.Column="1" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" Margin="0,0,6,0" Visibility="{Binding HasFrequency, Converter={StaticResource BooleanVisibility}}" ToolTip="{local:L T010}" />
+                    <Button Click="OnLearningTokenClick" Grid.Column="2" VerticalAlignment="Center">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource TokenAction}">
+                                <Setter Property="Content" Value="×" />
+                                <Setter Property="ToolTip" Value="{local:L T011}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Origin}" Value="ignored">
+                                        <Setter Property="Content" Value="↶" />
+                                        <Setter Property="ToolTip" Value="{local:L T008}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Origin}" Value="keyboard">
+                                        <Setter Property="Content" Value="+" />
+                                        <Setter Property="ToolTip" Value="{local:L T012}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+            <Style x:Key="NavItem" TargetType="TabItem">
+                <Setter Property="Foreground" Value="#20272B" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Border x:Name="NavSurface" Background="Transparent" CornerRadius="7" Margin="12,2" MinHeight="44">
+                                <Grid>
+                                    <Border x:Name="NavMarker" Width="3" Height="18" Background="{StaticResource Accent}" CornerRadius="1.5" HorizontalAlignment="Left" Visibility="Collapsed" />
+                                    <ContentPresenter x:Name="NavLabel" ContentSource="Header" VerticalAlignment="Center" Margin="15,0,8,0" TextElement.Foreground="#646E74" />
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="NavSurface" Property="Background" Value="{StaticResource AccentSoft}" />
+                                    <Setter TargetName="NavMarker" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="NavLabel" Property="TextElement.Foreground" Value="{StaticResource Accent}" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter TargetName="NavSurface" Property="Opacity" Value="0.78" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="NavSurface" Property="BorderBrush" Value="{StaticResource Accent}" />
+                                    <Setter TargetName="NavSurface" Property="BorderThickness" Value="1" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="NavTabs" TargetType="TabControl">
+                <Setter Property="ItemContainerStyle" Value="{StaticResource NavItem}" />
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <StackPanel />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabControl">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Background="#F4F9F7" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Top" Margin="26,27,0,31">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="Assets/iSay.png" Width="34" Height="34" Margin="0,0,11,0" RenderOptions.BitmapScalingMode="HighQuality"><Image.Clip><RectangleGeometry Rect="0,0,34,34" RadiusX="8" RadiusY="8" /></Image.Clip></Image>
+                                                <TextBlock Text="iSay" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel DockPanel.Dock="Bottom" Margin="25,24,22,22">
+                                            <TextBlock Text="{local:L T013}" Style="{StaticResource Hint}" Margin="0,0,0,8" />
+                                            <Border Background="White" BorderBrush="#DCE1E3" BorderThickness="1" CornerRadius="5" Padding="9,3" HorizontalAlignment="Left" MaxWidth="137">
+                                                <TextBlock Text="{Binding AppliedHotkeyDisplay}" FontFamily="Segoe UI" FontSize="12" TextWrapping="Wrap" />
+                                            </Border>
+                                            <TextBlock Text="{Binding AppliedGestureLabel}" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                                            <TextBlock Text="{local:L T014}" Style="{StaticResource Hint}" Margin="0,14,0,0" />
+                                            <TextBlock Text="{Binding ApplicationVersion}" Foreground="#9CA3A8" FontSize="11" Margin="0,7,0,0" />
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <ItemsPresenter />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                                <Grid Grid.Column="1" Margin="{TemplateBinding Padding}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="36,28,40,0" TextElement.Foreground="#20272B" />
+                                    <TextBlock Grid.Row="1" Text="{Binding StatusText}" Style="{StaticResource Hint}" Margin="36,12,40,16" ToolTip="{Binding StatusText}" MaxHeight="38" x:Name="GlobalStatusText" />
+                                </Grid>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="SelectedIndex" Value="1">
+                                    <Setter TargetName="PART_SelectedContentHost" Property="Margin" Value="0" />
+                                    <Setter TargetName="GlobalStatusText" Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                                <Trigger Property="SelectedIndex" Value="2">
+                                    <Setter TargetName="PART_SelectedContentHost" Property="Margin" Value="0" />
+                                    <Setter TargetName="GlobalStatusText" Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TabControl x:Name="NavigationTabs" Grid.RowSpan="2" Style="{StaticResource NavTabs}" KeyboardNavigation.TabNavigation="Continue">
+            <TabItem AutomationProperties.Name="{local:L T015}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="" FontSize="16" Margin="0,0,11,0" VerticalAlignment="Center" Foreground="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=(TextElement.Foreground)}" />
+                        <TextBlock Text="{local:L T015}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=(TextElement.Foreground)}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="130" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{local:L T015}" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="{Binding AppliedOutputHint}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip="{Binding AppliedOutputHint}" Style="{StaticResource Hint}" Margin="0,8,0,0" />
+                    </StackPanel>
+                    <Grid Grid.Row="1" Margin="0,15,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="52" Height="52" CornerRadius="26" Background="{StaticResource AccentSoft}" VerticalAlignment="Center">
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="" FontSize="23" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="18,0,18,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="18" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{local:L T016}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                    <Setter Property="Text" Value="{local:L T017}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                                    <Setter Property="Text" Value="{local:L T018}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding RecordingElapsed}" FontFamily="Segoe UI" FontSize="13" Foreground="{StaticResource Muted}" Margin="12,3,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBlock Text="{Binding EngineStatusText}" Style="{StaticResource Hint}" Margin="0,7,0,0" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip="{Binding EngineStatusText}" />
+                            <local:AudioWaveform Level="{Binding MicrophoneLevel}" IsActive="{Binding IsRecording}" WaveBrush="{StaticResource Accent}" Width="160" Height="23" HorizontalAlignment="Left" Margin="0,7,0,0">
+                                <local:AudioWaveform.Style>
+                                    <Style TargetType="local:AudioWaveform">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </local:AudioWaveform.Style>
+                            </local:AudioWaveform>
+                        </StackPanel>
+                        <Button Grid.Column="2" Tag="toggle-recording" Click="OnActionClick" Style="{StaticResource PrimaryButton}" MinWidth="126" MinHeight="42" IsEnabled="{Binding CanStartOrStop}" VerticalAlignment="Center">
+                            <Button.Content>
+                                <TextBlock Foreground="White">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{local:L T019}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                    <Setter Property="Text" Value="{local:L T020}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                                    <Setter Property="Text" Value="{local:L T021}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <Border Grid.Row="2" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="9" Background="White">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="43" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <TabControl x:Name="TranscriptTabs" Style="{StaticResource SectionTabs}" Margin="22,0,0,0">
+                                    <TabItem Header="{Binding TranscriptHeading}">
+                                        <TextBox x:Name="ResultTranscriptBox" Style="{StaticResource TranscriptEditor}" Margin="-22,-20,0,0" Text="{Binding TranscriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding TranscriptHeading}" />
+                                    </TabItem>
+                                    <TabItem Header="{local:L T022}">
+                                        <TextBox x:Name="RawTranscriptBox" Style="{StaticResource TranscriptEditor}" Margin="-22,-20,0,0" Text="{Binding RawText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{local:L N001}" />
+                                    </TabItem>
+                                </TabControl>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,12,0">
+                                    <Button Content="{local:L T023}" Tag="retry-formatting" Click="OnActionClick" Style="{StaticResource TextButton}" IsEnabled="{Binding CanReformat}" Margin="0,0,6,0" />
+                                    <Button Content="{local:L T024}" Click="OnCopyTranscriptClick" MinWidth="62">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <Setter Property="IsEnabled" Value="{Binding CanCopyTranscript}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=TranscriptTabs, Path=SelectedIndex}" Value="1">
+                                                        <Setter Property="IsEnabled" Value="{Binding CanCopyRaw}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Margin="15,40,15,0">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding HasTranscript}" Value="False" />
+                                                        <Condition Binding="{Binding ElementName=TranscriptTabs, Path=SelectedIndex}" Value="0" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding HasRawText}" Value="False" />
+                                                        <Condition Binding="{Binding ElementName=TranscriptTabs, Path=SelectedIndex}" Value="1" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <Path Data="M0,12 L0,20 M8,6 L8,26 M16,0 L16,32 M24,8 L24,24 M32,13 L32,19" Stroke="#B2C6BD" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" HorizontalAlignment="Center" Width="32" Height="32" Margin="0,0,0,19" />
+                                    <TextBlock Text="{local:L T025}" FontSize="16" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{local:L T026}" Style="{StaticResource Hint}" HorizontalAlignment="Center" Margin="0,9,0,0" />
+                                </StackPanel>
+                            </Grid>
+                            <Border Grid.Row="1" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="18,0,12,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding FormattingSummary}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Hint}">
+                                                <Setter Property="Text" Value="{Binding FormattingSummary}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFormatting}" Value="True">
+                                                        <Setter Property="Text" Value="{local:L T027}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <Button Grid.Column="2" Content="{local:L T028}" Style="{StaticResource TextButton}" Click="OnFormattingSettingsClick" />
+                                    <Button Grid.Column="1" Content="{local:L T029}" Tag="paste-result" Click="OnActionClick" IsEnabled="{Binding CanCopyTranscript}" Style="{StaticResource TextButton}" ToolTip="{local:L T030}" Margin="0,0,8,0" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+            <TabItem AutomationProperties.Name="{local:L T031}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="" FontSize="16" Margin="0,0,11,0" VerticalAlignment="Center" Foreground="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=(TextElement.Foreground)}" />
+                        <TextBlock Text="{local:L T031}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=(TextElement.Foreground)}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <ScrollViewer x:Name="HistoryPageScroll" Style="{StaticResource FullPageScroll}">
+                    <StackPanel Margin="36,28,28,24">
+                        <TextBlock Text="{local:L T031}" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="{local:L T032}" Style="{StaticResource Hint}" Margin="0,8,0,22" TextWrapping="Wrap" />
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <Grid Margin="0,0,12,0">
+                                <TextBox x:Name="HistorySearchBox" TextChanged="OnHistorySearchChanged" AutomationProperties.Name="{local:L N002}" ToolTip="{local:L T033}" />
+                                <TextBlock Text="{local:L T034}" Foreground="{StaticResource Muted}" Margin="12,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                                    <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=HistorySearchBox}" Value=""><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                            <Button Grid.Column="1" Content="···" Click="OnOpenWordTools" Width="36" Padding="0" ToolTip="{local:L T035}" AutomationProperties.Name="{local:L N003}">
+                                <Button.ContextMenu><ContextMenu><MenuItem Header="{local:L T036}" Tag="clear-history" Click="OnActionClick" /></ContextMenu></Button.ContextMenu>
+                            </Button>
+                        </Grid>
+                        <DockPanel Margin="0,0,0,12">
+                            <TextBlock x:Name="HistoryResultCount" Style="{StaticResource Hint}" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <TextBlock x:Name="HistoryFeedbackText" Text="{Binding StatusText}" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,0,0,12" Visibility="Collapsed" />
+                        <ListBox x:Name="HistoryList" Background="Transparent" BorderThickness="0" Padding="0" HorizontalContentAlignment="Stretch" SelectionChanged="OnHistorySelectionChanged">
+                            <ListBox.Template><ControlTemplate TargetType="ListBox"><ItemsPresenter /></ControlTemplate></ListBox.Template>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><Border Padding="1"><ContentPresenter /></Border></ControlTemplate></Setter.Value></Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="0,28,0,6">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Converter={StaticResource HistoryPreview}}" FontSize="16" Foreground="{StaticResource Ink}" TextWrapping="Wrap" LineHeight="28" Margin="0,0,24,0" />
+                                                <Button Grid.Column="1" Content="{local:L T024}" Tag="copy-history" Click="OnHistoryActionClick" Style="{StaticResource HistoryCopyButton}" VerticalAlignment="Top" ToolTip="{local:L T037}" />
+                                            </Grid>
+                                            <Grid Margin="0,14,0,0">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <DockPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                                    <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm}}" FontSize="12" Foreground="{StaticResource Muted}" DockPanel.Dock="Left" />
+                                                    <TextBlock Text="{Binding Status}" FontSize="11" Foreground="#939C98" Margin="12,0,0,0" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding Status}" />
+                                                </DockPanel>
+                                                <Button Grid.Column="1" Content="···" Tag="history-more" Click="OnHistoryMoreClick" Style="{StaticResource HistoryMoreButton}" IsEnabled="{Binding DataContext.CanEditSettings, RelativeSource={RelativeSource AncestorType=ListBox}}" ToolTip="{local:L T038}" AutomationProperties.Name="{local:L N003}">
+                                                    <Button.ContextMenu>
+                                                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding PlacementTarget.IsEnabled, RelativeSource={RelativeSource Self}}">
+                                                            <MenuItem Header="{local:L T039}" Tag="history-load" Click="OnHistoryActionClick" />
+                                                            <MenuItem Header="{local:L T040}" Tag="archive-audio" Click="OnHistoryActionClick" />
+                                                        </ContextMenu>
+                                                    </Button.ContextMenu>
+                                                </Button>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock x:Name="HistoryEmptyLabel" Text="{local:L T041}" Style="{StaticResource Hint}" HorizontalAlignment="Center" Margin="0,60" Visibility="Collapsed" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                            <Button x:Name="HistoryPreviousPage" Content="{local:L T042}" Tag="-1" Click="OnHistoryPageClick" />
+                            <TextBlock x:Name="HistoryPageNumber" VerticalAlignment="Center" Style="{StaticResource Hint}" Margin="16,0" />
+                            <Button x:Name="HistoryNextPage" Content="{local:L T043}" Tag="1" Click="OnHistoryPageClick" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem AutomationProperties.Name="{local:L T044}" Tag="configuration" x:Name="VocabularyPage">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="" FontSize="16" Margin="0,0,11,0" />
+                        <TextBlock Text="{local:L T044}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <ScrollViewer x:Name="VocabularyPageScroll" Style="{StaticResource FullPageScroll}">
+                    <StackPanel Margin="36,28,28,24">
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{local:L T044}" Style="{StaticResource PageTitle}" />
+                                <Button x:Name="VocabularyHelpButton" Content="?" Style="{StaticResource HelpButton}" Margin="10,0,0,0" VerticalAlignment="Center" Click="OnVocabularyHelpClick" AutomationProperties.Name="{local:L N004}" ToolTipService.ShowDuration="5000" ToolTipService.InitialShowDelay="250">
+                                    <Button.ToolTip>
+                                        <ToolTip><TextBlock MaxWidth="340" TextWrapping="Wrap" LineHeight="23" Text="{local:L T045}" /></ToolTip>
+                                    </Button.ToolTip>
+                                </Button>
+                            </StackPanel>
+                            <Button x:Name="VocabularyLearningSettingsButton" Grid.Column="1" Content="{local:L T046}" Click="OnToggleVocabularyLearningSettings" VerticalAlignment="Center" ToolTip="{local:L T047}" />
+                        </Grid>
+                        <Border x:Name="VocabularyLearningSettings" Visibility="Collapsed" Background="#F6F8F7" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,16">
+                                    <CheckBox Content="{local:L T048}" IsChecked="{Binding Settings.AsrVocabularyEnabled, Mode=TwoWay}" IsEnabled="{Binding CanEditSettings}" VerticalAlignment="Center" ToolTip="{local:L T049}" />
+                                </DockPanel>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Margin="0,0,16,0">
+                                            <CheckBox Content="{local:L T050}" IsChecked="{Binding Settings.AutoVocabularyLearningEnabled, Mode=TwoWay}" Margin="0,0,0,4" />
+                                            <TextBlock Text="{Binding AutoLearningStatusText}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <CheckBox Content="{local:L T051}" IsChecked="{Binding Settings.KeyboardLearningEnabled, Mode=TwoWay}" Margin="0,0,0,4" />
+                                            <TextBlock Text="{Binding KeyboardLearningStatusText}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource AccentSoft}" CornerRadius="6" Padding="12" Margin="0,0,0,16" Visibility="{Binding SettingsDirty, Converter={StaticResource BooleanVisibility}}">
+                            <DockPanel>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Content="{local:L T052}" Tag="discard-settings" Click="OnActionClick" Style="{StaticResource TextButton}" Margin="0,0,8,0" />
+                                    <Button Content="{local:L T053}" Tag="save-settings" Click="OnActionClick" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanEditSettings}" />
+                                </StackPanel>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{local:L T054}" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="VocabularySettingsError" Visibility="Collapsed" Foreground="#B34B41" FontSize="12" TextWrapping="Wrap" Margin="0,4,8,0" />
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                        <TextBlock Text="{Binding VocabularyStatusText}" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,0,0,12" Visibility="{Binding HasVocabularyFeedback, Converter={StaticResource BooleanVisibility}}" />
+                        <TabControl x:Name="VocabularyContent" Style="{StaticResource SectionTabs}" IsEnabled="{Binding CanEditSettings}" SelectionChanged="OnVocabularyTabChanged">
+                            <TabItem Header="{local:L T055}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12" IsEnabled="{Binding CanManageVocabulary}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Margin="0,0,12,0">
+                                            <TextBox x:Name="WordSearch" Padding="8,4" Tag="local-vocabulary-editor" Text="{Binding VocabularyQuickText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{local:L N005}" MaxLength="64" KeyDown="OnQuickWordKeyDown" ToolTip="{local:L T056}" />
+                                            <TextBlock Text="{local:L T057}" Margin="14,0" Foreground="{StaticResource Muted}" IsHitTestVisible="False" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Text, ElementName=WordSearch}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                        <Button Grid.Column="1" Content="{local:L T058}" Click="OnQuickWordSearch" Margin="0,0,8,0" />
+                                        <Button Grid.Column="2" Content="{local:L T059}" Click="OnQuickWordAdd" Style="{StaticResource PrimaryButton}" Margin="0,0,8,0" />
+                                        <Button Grid.Column="3" Content="···" ToolTip="{local:L T060}" Click="OnOpenWordTools" MinWidth="36">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="{local:L T061}" Tag="preview-vocabulary-file" Click="OnActionClick" />
+                                                    <MenuItem Header="{local:L T062}" Tag="preview-official-vocabulary" Click="OnActionClick" />
+                                                    <MenuItem Header="{local:L T063}" Tag="export-vocabulary" Click="OnActionClick" />
+                                                    <Separator />
+                                                    <MenuItem Header="{local:L T064}" IsCheckable="True" IsChecked="{Binding PreferredOnly}" />
+                                                    <MenuItem Header="{local:L T065}" Tag="recent" Click="OnWordSortClick" />
+                                                    <MenuItem Header="{local:L T066}" Tag="name" Click="OnWordSortClick" />
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                        </Button>
+                                    </Grid>
+                                    <DockPanel Margin="0,0,0,12" LastChildFill="True">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                                            <Button x:Name="DeleteSelectedWords" Content="{local:L T067}" Click="OnDeleteSelectedWords" Style="{StaticResource TextButton}" IsEnabled="{Binding SelectedItem, ElementName=RecognitionWordList, Converter={StaticResource NotNull}}" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding RecognitionWordCount}" Style="{StaticResource Hint}" VerticalAlignment="Center" />
+                                    </DockPanel>
+                                    <Border x:Name="VocabularyWordEditorHost" Background="#F4F7F5" CornerRadius="8" Padding="14" Margin="0,0,0,12" Visibility="{Binding VocabularyEditorOpen, Converter={StaticResource BooleanVisibility}}" IsEnabled="{Binding CanManageVocabulary}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding VocabularyEditorTitle}" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,20" />
+                                            <Grid>
+                                                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="WordEditor" Grid.ColumnSpan="3" Padding="11,8" Tag="local-vocabulary-editor" Text="{Binding VocabularyDraft, UpdateSourceTrigger=PropertyChanged}" MaxLength="64" KeyDown="OnWordEditorKeyDown" AutomationProperties.Name="{local:L N006}" />
+                                                <Button Grid.Row="1" Grid.Column="2" Content="{local:L T068}" Click="OnSaveWordClick" Style="{StaticResource PrimaryButton}" Margin="8,16,0,0" />
+                                                <Button Grid.Row="1" Grid.Column="1" Content="{local:L T069}" Click="OnCancelWordEdit" Style="{StaticResource TextButton}" Margin="4,16,0,0" />
+                                            </Grid>
+                                            <TextBlock Text="{local:L T070}" Style="{StaticResource Hint}" Margin="0,8,0,0" />
+                                            <TextBlock Text="{Binding VocabularyStatusText}" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border x:Name="VocabularyImportHost" Background="{StaticResource AccentSoft}" CornerRadius="8" Padding="12" Margin="0,0,0,12" Visibility="{Binding HasVocabularyImport, Converter={StaticResource BooleanVisibility}}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding VocabularyImportPreview}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                                                <Button Content="{local:L T069}" Click="OnCancelWordImport" Style="{StaticResource TextButton}" Margin="0,0,8,0" />
+                                                <Button Content="{local:L T071}" Tag="apply-vocabulary-import" Click="OnActionClick" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanApplyVocabularyImport}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                    <Grid>
+                                        <ListBox x:Name="RecognitionWordList" Style="{StaticResource TokenList}" ItemsSource="{Binding VisibleRecognitionWords}" ItemTemplate="{StaticResource WordToken}" SelectionMode="Extended" SelectionChanged="OnWordSelectionChanged" MouseDoubleClick="OnWordDoubleClick" PreviewKeyDown="OnWordListKeyDown" IsEnabled="{Binding CanManageVocabulary}" />
+                                        <TextBlock Text="{local:L T072}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Hint}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasItems, ElementName=RecognitionWordList}" Value="False">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem Header="{local:L T073}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="140" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="112" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding LearningSource}" ToolTip="{Binding LearningSourceDescription}" Tag="local-vocabulary-editor" SelectionChanged="OnVocabularyFilterChanged">
+                                            <ComboBoxItem Content="{local:L T074}" Tag="voice" />
+                                            <ComboBoxItem Content="{local:L T075}" Tag="keyboard" />
+                                            <ComboBoxItem Content="{local:L T076}" Tag="ignored" />
+                                        </ComboBox>
+                                        <Grid Grid.Column="1" Margin="10,0">
+                                            <TextBox x:Name="LearningSearchBox" Padding="8,4" Tag="local-vocabulary-editor" Text="{Binding LearningSearch, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{local:L N007}" TextChanged="OnVocabularyFilterChanged" />
+                                            <TextBlock Text="{local:L T077}" Margin="14,0" Foreground="{StaticResource Muted}" IsHitTestVisible="False" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Text, ElementName=LearningSearchBox}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                        <Button Grid.Column="3" Content="{local:L T078}" Click="OnRequestClearLearning">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource TextButton}">
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding LearningSource}" Value="ignored">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <ComboBox Grid.Column="2" SelectedValuePath="Tag" SelectedValue="{Binding LearningSort}" Tag="local-vocabulary-editor" Margin="0,0,8,0" SelectionChanged="OnVocabularyFilterChanged" ToolTip="{local:L T079}">
+                                            <ComboBoxItem Content="{Binding FrequencySortLabel}" Tag="frequency" />
+                                            <ComboBoxItem Content="{local:L T080}" Tag="recent" IsEnabled="{Binding CanSortLearningByTime}" />
+                                            <ComboBoxItem Content="{local:L T081}" Tag="name" />
+                                        </ComboBox>
+                                    </Grid>
+                                    <DockPanel Margin="0,0,0,12" LastChildFill="True">
+                                        <TextBlock Text="{Binding LearningResultCount}" Style="{StaticResource Hint}" />
+                                    </DockPanel>
+                                    <Border x:Name="ClearLearningConfirmation" Visibility="Collapsed" Background="#FAF5ED" Padding="12" CornerRadius="8" Margin="0,0,0,12">
+                                        <StackPanel>
+                                            <TextBlock x:Name="ClearLearningMessage" TextWrapping="Wrap" />
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                                                <Button Content="{local:L T069}" Click="OnCancelClearLearning" Style="{StaticResource TextButton}" Margin="0,0,8,0" />
+                                                <Button Content="{local:L T082}" Click="OnConfirmClearLearning" Style="{StaticResource PrimaryButton}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                    <Grid>
+                                        <ListBox x:Name="LearnedWordList" Style="{StaticResource TokenList}" ItemsSource="{Binding VisibleLearningTokens}" ItemTemplate="{StaticResource LearnedToken}" IsEnabled="{Binding CanManageVocabulary}" />
+                                        <TextBlock Text="{local:L T083}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Hint}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasItems, ElementName=LearnedWordList}" Value="False">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem Header="{local:L T084}">
+                                <StackPanel>
+                                    <TextBlock Text="{local:L T085}" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Content="{local:L T086}" IsChecked="{Binding Settings.LearnVocabularyEnabled, Mode=TwoWay}" VerticalAlignment="Center" />
+                                        <Button Grid.Column="1" Content="{local:L T087}" Click="OnAddCorrectionClick" Style="{StaticResource PrimaryButton}" />
+                                    </Grid>
+                                    <Button Content="{local:L T088}" Tag="undo-correction-delete" Click="OnActionClick" Style="{StaticResource TextButton}" Visibility="{Binding CanUndoCorrection, Converter={StaticResource BooleanVisibility}}" HorizontalAlignment="Left" Margin="0,0,0,10" />
+                                    <Border x:Name="CorrectionEditorHost" Visibility="{Binding CorrectionEditorOpen, Converter={StaticResource BooleanVisibility}}">
+    <StackPanel>
+        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="24"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <StackPanel><TextBlock Text="{local:L T089}" Margin="0,0,0,8"/><TextBox x:Name="CorrectionMistakenEditor" Tag="local-vocabulary-editor" Padding="10,8" Text="{Binding MistakenWord, UpdateSourceTrigger=PropertyChanged}" MaxLength="64" KeyDown="OnCorrectionEditorKeyDown" AutomationProperties.Name="{local:L N008}"/></StackPanel>
+            <StackPanel Grid.Column="2"><TextBlock Text="{local:L T090}" Margin="0,0,0,8"/><TextBox Tag="local-vocabulary-editor" Padding="10,8" Text="{Binding CorrectedWord, UpdateSourceTrigger=PropertyChanged}" MaxLength="64" KeyDown="OnCorrectionEditorKeyDown" AutomationProperties.Name="{local:L N009}"/></StackPanel>
+        </Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+            <Button Content="{local:L T069}" Click="OnCancelCorrectionEdit" Style="{StaticResource TextButton}" Margin="0,0,8,0"/>
+            <Button Content="{local:L T091}" Click="OnSaveCorrectionClick" Style="{StaticResource PrimaryButton}"/>
+        </StackPanel>
+    </StackPanel>
+</Border>
+                                    <Grid>
+                                        <ListBox x:Name="PersonalCorrectionList" ItemsSource="{Binding PersonalCorrections}" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" Background="Transparent">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,5">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Mistaken}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding Mistaken}" />
+                                                        <TextBlock Grid.Column="1" Text="→" Foreground="{StaticResource Muted}" Margin="16,0" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding Corrected}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding Corrected}" />
+                                                        <Button Grid.Column="3" Content="{local:L T039}" Style="{StaticResource TextButton}" Click="OnEditCorrectionClick" />
+                                                        <Button Grid.Column="4" Content="×" Style="{StaticResource TokenAction}" Click="OnDeleteCorrectionClick" ToolTip="{local:L T092}" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                            <ListBox.Template>
+                                                <ControlTemplate TargetType="ListBox">
+                                                    <ItemsPresenter />
+                                                </ControlTemplate>
+                                            </ListBox.Template>
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel />
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                        </ListBox>
+                                        <TextBlock Text="{local:L T093}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Hint}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasItems, ElementName=PersonalCorrectionList}" Value="False">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </TabItem>
+                        </TabControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem AutomationProperties.Name="{local:L T094}" Tag="configuration" x:Name="FormattingPage">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{local:L T094}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="0,0,0,20">
+                        <TextBlock Text="{local:L T094}" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="{local:L T095}" Style="{StaticResource Hint}" Margin="0,8,0,0" />
+                    </StackPanel>
+                    <ScrollViewer Margin="0,0,-40,0" Style="{StaticResource FullPageScroll}" x:Name="FormattingContent" Grid.Row="1" IsEnabled="{Binding CanEditSettings}">
+                        <StackPanel Margin="0,5,40,15">
+                            <CheckBox Content="{local:L T096}" IsChecked="{Binding Settings.SmartFormattingEnabled, Mode=TwoWay}" />
+                            <Grid Style="{StaticResource FieldRow}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:L T097}" Style="{StaticResource FieldLabel}" />
+                                <ComboBox x:Name="FormattingBackendChoice" Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Settings.FormattingBackend, Mode=TwoWay}">
+                                    <ComboBoxItem Content="{local:L T098}" Tag="auto" />
+                                    <ComboBoxItem Content="{local:L T099}" Tag="native" />
+                                    <ComboBoxItem Content="{local:L T100}" Tag="custom-api" />
+                                </ComboBox>
+                            </Grid>
+                            <TextBlock Text="{local:L T101}" Style="{StaticResource Hint}" Margin="150,0,0,16" />
+                            <Grid Style="{StaticResource FieldRow}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:L T102}" Style="{StaticResource FieldLabel}" />
+                                <ComboBox Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Settings.FormattingStyle, Mode=TwoWay}">
+                                    <ComboBoxItem Content="{local:L T103}" Tag="standard" />
+                                    <ComboBoxItem Content="{local:L T104}" Tag="literal" />
+                                    <ComboBoxItem Content="{local:L T105}" Tag="paragraphs" />
+                                </ComboBox>
+                            </Grid>
+                            <CheckBox Content="{local:L T106}" IsChecked="{Binding Settings.RemoveFillers, Mode=TwoWay}" />
+                            <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Margin="0,9,0,23" />
+                            
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T107}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                        <ComboBox Grid.Column="0" SelectedValuePath="Tag" SelectedValue="{Binding Settings.PunctuationMode, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="2">
+                                            <ComboBoxItem Content="{local:L T108}" Tag="all" />
+                                            <ComboBoxItem Content="{local:L T109}" Tag="spaces" />
+                                            <ComboBoxItem Content="{local:L T110}" Tag="no-final" />
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T111}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                        <ComboBox Grid.Column="0" SelectedValuePath="Tag" SelectedValue="{Binding Settings.LatinSpacing, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="2">
+                                            <ComboBoxItem Content="{local:L T112}" Tag="preserve" />
+                                            <ComboBoxItem Content="{local:L T113}" Tag="compact" />
+                                            <ComboBoxItem Content="{local:L T114}" Tag="spaced" />
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="{local:L T115}" Style="{StaticResource Hint}" Margin="0,0,0,18" />
+                            <Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T100}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T116}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T117}" Tag="format-api" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="FormattingApiHost" Visibility="Collapsed"><StackPanel><StackPanel Margin="0,18,0,0">
+                                    <TextBlock Text="{local:L T118}" Style="{StaticResource Hint}" Margin="0,-10,0,20" />
+                                    <Grid Style="{StaticResource FieldRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T119}" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Grid.Column="1" Text="{Binding Settings.ApiBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:L T120}" />
+                                    </Grid>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T121}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <TextBox Grid.Column="0" Text="{Binding Settings.ApiModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.ColumnSpan="2" />
+                                            </Grid>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T122}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <PasswordBox x:Name="ApiKeyBox" Grid.Column="0" PasswordChanged="OnApiKeyChanged" Grid.Row="1" Grid.ColumnSpan="2" />
+                                            </Grid>
+                                            <Button Content="{local:L T123}" Tag="clear-format-key" Click="OnActionClick" Style="{StaticResource TextButton}" HorizontalAlignment="Left" Margin="0,0,0,12" />
+                                            <TextBlock Text="{local:L T124}" Style="{StaticResource Hint}" Margin="0,0,0,12" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel></StackPanel></Border>
+<Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T125}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T126}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T117}" Tag="format-rules" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="FormattingRulesHost" Visibility="Collapsed"><StackPanel><StackPanel Margin="0,18,0,0">
+                                    <TextBlock Text="{local:L T127}" Margin="0,0,0,8" />
+                                    <TextBox Text="{Binding Settings.CustomVocabulary, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="78" MaxHeight="130" VerticalScrollBarVisibility="Auto" />
+                                    <TextBlock Text="{local:L T128}" Style="{StaticResource Hint}" Margin="0,7,0,16" />
+                                    <TextBlock Text="{local:L T129}" Margin="0,0,0,8" />
+                                    <TextBox Text="{Binding Settings.FormattingInstructions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="78" MaxHeight="130" VerticalScrollBarVisibility="Auto" />
+                                </StackPanel></StackPanel></Border>
+                            <Button Content="{local:L T130}" Tag="test-format" Click="OnActionClick" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+            <TabItem AutomationProperties.Name="{local:L T131}" x:Name="SettingsPage" Tag="configuration">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="" FontSize="16" Margin="0,0,11,0" VerticalAlignment="Center" Foreground="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=(TextElement.Foreground)}" />
+                        <TextBlock Text="{local:L T131}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=(TextElement.Foreground)}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{local:L T131}" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="{local:L T132}" Style="{StaticResource Hint}" Margin="0,8,0,13" />
+                    </StackPanel>
+                    <TabControl x:Name="SettingsContent" Grid.Row="1" Style="{StaticResource SectionTabs}">
+                        <TabItem Header="{local:L T133}" IsEnabled="{Binding CanEditSettings}">
+                            <ScrollViewer Margin="0,0,-40,0" Style="{StaticResource FullPageScroll}">
+                                <StackPanel Margin="0,5,40,15">
+                                    <TextBlock Text="{local:L T134}" Style="{StaticResource SectionTitle}" />
+                                    <CheckBox x:Name="MuteSystemAudioOption" Content="{local:L T135}" IsChecked="{Binding Settings.MuteSystemAudioWhileRecording, Mode=TwoWay}" />
+                                    <TextBlock Text="{local:L T136}" Style="{StaticResource Hint}" Margin="0,-2,0,12" />
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{local:L T137}" Margin="0,0,0,8" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <ComboBox x:Name="RecordingMicrophoneChoice" ItemsSource="{Binding Microphones}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding SelectedMicrophoneId, Mode=TwoWay}" MinHeight="46" AutomationProperties.Name="{local:L N010}" />
+                                                <Button Grid.Column="1" Content="{local:L T138}" Tag="refresh-devices" Click="OnActionClick" Margin="8,0,0,0" MinHeight="46" />
+                                            </Grid>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T013}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <Button x:Name="HotkeyCaptureButton" Grid.Column="0" Click="OnStartHotkeyCapture" HorizontalContentAlignment="Stretch" MinHeight="46" InputMethod.IsInputMethodEnabled="False" AutomationProperties.Name="{local:L N011}" Grid.Row="1" Grid.ColumnSpan="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock x:Name="HotkeyCaptureValue" Text="{Binding DraftHotkeyDisplay}" FontFamily="Segoe UI" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center" />
+                                                        <TextBlock x:Name="HotkeyRecorderLabel" Grid.Column="1" Text="{local:L T139}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                                    </Grid>
+                                                </Button>
+                                                <Button x:Name="CancelHotkeyCaptureButton" Grid.Column="2" Content="{local:L T069}" Click="OnCancelHotkeyCapture" Style="{StaticResource TextButton}" Margin="8,0,0,0" Visibility="Collapsed" Grid.Row="1" />
+                                            </Grid>
+                                            <TextBlock x:Name="HotkeyCaptureHint" Text="{local:L T140}" ToolTip="{local:L T141}" Style="{StaticResource Hint}" Margin="0,0,0,12" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{local:L T142}" Margin="0,0,0,8" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="RecordingDurationEditor" Text="{Binding Settings.MaxRecordingSeconds, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" ToolTip="{local:L T143}" AutomationProperties.Name="{local:L N012}" />
+                                                <TextBlock Grid.Column="1" Text="{local:L T144}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                            </Grid>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T145}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <ComboBox x:Name="RecordingModeChoice" Grid.Column="0" SelectedValuePath="Tag" SelectedValue="{Binding Settings.HotkeyMode, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="2">
+                                                    <ComboBoxItem Content="{local:L T146}" Tag="toggle" />
+                                                    <ComboBoxItem Content="{local:L T147}" Tag="hold" />
+                                                </ComboBox>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,18">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="20" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="{local:L T148}" Margin="0,0,0,8" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <TextBox x:Name="NoNewTextTimeoutEditor" Text="{Binding Settings.NoNewTextTimeoutSeconds, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" ToolTip="{local:L T149}" AutomationProperties.Name="{local:L N013}" />
+                                                <TextBlock Grid.Column="1" Text="{local:L T144}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                            </Grid>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{local:L T150}" Style="{StaticResource Hint}" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="0,0,0,9" />
+                                    </Grid>
+                                    <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Margin="0,10,0,26" />
+                                    <TextBlock Text="{local:L T151}" Style="{StaticResource SectionTitle}" />
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T152}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <ComboBox Grid.Column="0" SelectedValuePath="Tag" SelectedValue="{Binding Settings.OutputMode, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="2">
+                                                    <ComboBoxItem Content="{local:L T153}" Tag="live" />
+                                                    <ComboBoxItem Content="{local:L T154}" Tag="on-stop" />
+                                                    <ComboBoxItem Content="{local:L T155}" Tag="clipboard" />
+                                                </ComboBox>
+                                            </Grid>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T156}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <ComboBox Grid.Column="0" SelectedValuePath="Tag" SelectedValue="{Binding Settings.InputBackend, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="2">
+                                                    <ComboBoxItem Content="{local:L T157}" Tag="tsf" />
+                                                    <ComboBoxItem Content="{local:L T158}" Tag="compatibility" />
+                                                </ComboBox>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T159}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T160}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T161}" Tag="input-tools" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="InputToolsHost" Visibility="Collapsed"><StackPanel><Grid Style="{StaticResource FieldRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T162}" Style="{StaticResource FieldLabel}" />
+                                        <StackPanel Grid.Column="1">
+                                            <Button Content="{local:L T163}" Tag="retry-composition" Click="OnActionClick" HorizontalAlignment="Left" />
+                                            <TextBlock Text="{local:L T164}" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Style="{StaticResource FieldRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T165}" Style="{StaticResource FieldLabel}" />
+                                        <TextBlock Grid.Column="1" Text="{local:L T166}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <TextBlock Text="{local:L T167}" Style="{StaticResource Hint}" Margin="150,0,0,0" />
+</StackPanel></Border>                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="{local:L T168}" IsEnabled="{Binding CanEditSettings}">
+                            <ScrollViewer Margin="0,0,-40,0" Style="{StaticResource FullPageScroll}">
+                                <StackPanel Margin="0,5,40,15">
+                                    <Grid Style="{StaticResource FieldRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T169}" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="EngineChoice" Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Settings.Engine, Mode=TwoWay}">
+                                            <ComboBoxItem Content="{local:L T170}" Tag="native" />
+                                            <ComboBoxItem Content="{local:L T171}" Tag="openai-compatible" />
+                                        </ComboBox>
+                                    </Grid>
+<Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T172}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T173}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T117}" Tag="speech-service" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="SpeechServiceHost" Visibility="Collapsed"><StackPanel><TextBlock Text="{local:L T174}" FontWeight="SemiBold" Margin="0,0,0,8"/><TextBlock Text="{local:L T175}" Style="{StaticResource Hint}" Margin="0,0,0,18"/><Grid Style="{StaticResource FieldRow}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{local:L T176}" Style="{StaticResource FieldLabel}" />
+                                            <TextBox Grid.Column="1" Text="{Binding Settings.AsrBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </Grid>
+                                        <Grid Margin="0,0,0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="20" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{local:L T177}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                    <TextBox Grid.Column="0" Text="{Binding Settings.AsrModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.ColumnSpan="2" />
+                                                </Grid>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2">
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{local:L T178}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                    <PasswordBox x:Name="AsrApiKeyBox" Grid.Column="0" PasswordChanged="OnAsrApiKeyChanged" Grid.Row="1" Grid.ColumnSpan="2" />
+                                                </Grid>
+                                                <Button Content="{local:L T179}" Tag="clear-asr-key" Click="OnActionClick" Style="{StaticResource TextButton}" HorizontalAlignment="Left" Margin="0,0,0,12" />
+                                                <TextBlock Text="{local:L T180}" Style="{StaticResource Hint}" Margin="0,0,0,12" />
+                                            </StackPanel>
+                                        </Grid>
+                                    <TextBlock Text="{local:L T181}" FontWeight="SemiBold" Margin="0,12,0,0"/><StackPanel Margin="0,12,0,0">
+                                            <TextBox Text="{Binding Settings.NativeRuntimePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{local:L N014}" />
+                                            <TextBlock Text="{local:L T182}" Style="{StaticResource Hint}" Margin="0,7,0,0" />
+                                        </StackPanel></StackPanel></Border>
+                                    
+                                    <Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T183}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T184}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T161}" Tag="diagnostics" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="DiagnosticsHost" Visibility="Collapsed"><StackPanel><Button Content="{local:L T185}" Tag="test-engine" Click="OnActionClick" HorizontalAlignment="Left" />
+                                    <Button Content="{local:L T186}" Tag="inspect-native-runtime" Click="OnActionClick" HorizontalAlignment="Left" Margin="0,8,0,0" IsEnabled="{Binding CanManageVocabulary}" />
+                                    <TextBlock Text="{Binding EngineStatusText}" Style="{StaticResource Hint}" Margin="0,10,0,22" />
+                                    </StackPanel></Border><Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Margin="0,4,0,24" />
+                                    <TextBlock Text="{local:L T187}" Style="{StaticResource SectionTitle}" />
+                                    <Grid Style="{StaticResource FieldRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T188}" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="ProxyChoice" Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Settings.ProxyMode, Mode=TwoWay}">
+                                            <ComboBoxItem Content="{local:L T189}" Tag="system" />
+                                            <ComboBoxItem Content="{local:L T190}" Tag="direct" />
+                                            <ComboBoxItem Content="{local:L T191}" Tag="custom" />
+                                        </ComboBox>
+                                    </Grid>
+<Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T192}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T193}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T117}" Tag="proxy" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="ProxySettingsHost" Visibility="Collapsed"><StackPanel><Grid Style="{StaticResource FieldRow}"><Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{local:L T194}" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Grid.Column="1" Text="{Binding Settings.ProxyUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:L T195}" />
+                                    </Grid></StackPanel></Border>
+                                    <TextBlock Text="{local:L T196}" Style="{StaticResource Hint}" Margin="150,0,0,0" />
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="{local:L T197}" IsEnabled="{Binding CanEditSettings}">
+                            <ScrollViewer Margin="0,0,-40,0" Style="{StaticResource FullPageScroll}">
+                                <StackPanel Margin="0,5,40,15">
+                                    <TextBlock Text="{local:L T198}" Style="{StaticResource SectionTitle}" />
+                                    <UniformGrid Columns="2" Margin="0,0,0,8"><CheckBox Content="{local:L T199}" IsChecked="{Binding Settings.StartAtLogin, Mode=TwoWay}" /><CheckBox Content="{local:L T200}" IsChecked="{Binding Settings.StartMinimized, Mode=TwoWay}" /><CheckBox Content="{local:L T201}" IsChecked="{Binding Settings.ShowFloatingBar, Mode=TwoWay}" /><CheckBox Content="{local:L T202}" IsChecked="{Binding Settings.SoundFeedback, Mode=TwoWay}" /></UniformGrid>
+<Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Margin="0,10,0,24" />
+                                    <TextBlock Text="{local:L T203}" Style="{StaticResource SectionTitle}" />
+                                    <Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T204}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T205}" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" Content="{local:L T206}" Tag="storage" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+    </Grid><Border x:Name="StorageSettingsHost" Visibility="Collapsed"><StackPanel><CheckBox Content="{local:L T207}" IsChecked="{Binding Settings.SaveHistory, Mode=TwoWay}" />
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T208}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <TextBox Grid.Column="0" Text="{Binding Settings.HistoryRetentionDays, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" Grid.Row="1" Grid.ColumnSpan="2" />
+                                                <TextBlock Grid.Column="2" Text="{local:L T209}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="12,0,0,0" Grid.Row="1" />
+                                            </Grid>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{local:L T210}" Margin="0,0,0,8" Grid.ColumnSpan="3" />
+                                                <TextBox Grid.Column="0" Text="{Binding Settings.AudioRetentionDays, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" Grid.Row="1" Grid.ColumnSpan="2" />
+                                                <TextBlock Grid.Column="2" Text="{local:L T211}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="12,0,0,0" Grid.Row="1" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                    <CheckBox Content="{local:L T212}" IsChecked="{Binding Settings.SaveAudio, Mode=TwoWay}" />
+                                    <TextBlock Text="{local:L T213}" Style="{StaticResource Hint}" TextWrapping="Wrap"/></StackPanel></Border><Grid Margin="0,4,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <StackPanel Margin="0,0,20,0"><TextBlock Text="{local:L T214}" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="{local:L T215}" Style="{StaticResource Hint}" Margin="0,6,0,0"/></StackPanel>
+    <Button Grid.Column="1" Content="{local:L T161}" Tag="data-tools" Click="OnOpenManagementClick" VerticalAlignment="Center" MinWidth="86"/>
+</Grid><Border x:Name="DataToolsHost" Visibility="Collapsed"><StackPanel><TextBlock Text="{local:L T216}" Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="{local:L T217}" Tag="archive-old-audio" Click="OnActionClick" />
+                                        <Button Content="{local:L T218}" Tag="open-audio-archive" Click="OnActionClick" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                    <TextBlock Text="{local:L T219}" Style="{StaticResource Hint}" Margin="0,0,0,18" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="{local:L T220}" Tag="open-data-folder" Click="OnActionClick" />
+                                        <Button Content="{local:L T221}" Tag="restore-defaults" Click="OnActionClick" Margin="10,0,0,0" />
+                                    </StackPanel></StackPanel></Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem x:Name="AboutPage" Header="{local:L A001}" AutomationProperties.Name="{local:L A001}">
+                            <ScrollViewer Margin="0,0,-40,0" Style="{StaticResource FullPageScroll}">
+                                <StackPanel x:Name="AboutContent" Margin="0,5,40,15">
+                                    <TextBlock Text="iSay" FontSize="30" FontWeight="SemiBold" />
+                                    <TextBlock Text="{local:L A002}" Style="{StaticResource Hint}" Margin="0,6,0,26" />
+                                    <Grid Margin="0,0,0,28">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                        <TextBlock Text="{local:L A003}" /><TextBlock Grid.Column="1" Text="{Binding ApplicationVersion}" />
+                                        <TextBlock Grid.Row="1" Text="{local:L A004}" Margin="0,12,0,0" /><TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CompositionVersion}" Margin="0,12,0,0" />
+                                    </Grid>
+                                    <TextBlock Text="{local:L A005}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,14" />
+                                    <ComboBox x:Name="LanguagePicker" Width="220" HorizontalAlignment="Left" IsEnabled="{Binding CanEditSettings}" SelectedValuePath="Tag" SelectionChanged="OnLanguageSelectionChanged" SelectedValue="{Binding Settings.UiLanguage, Mode=TwoWay}">
+                                        <ComboBoxItem Content="简体中文" Tag="zh-CN" /><ComboBoxItem Content="English" Tag="en-US" />
+                                    </ComboBox>
+                                    <TextBlock Text="{local:L A006}" Style="{StaticResource Hint}" Margin="0,8,0,24" />
+                                    <CheckBox Content="{local:L A007}" IsChecked="{Binding Settings.AutoCheckUpdates, Mode=TwoWay}" IsEnabled="{Binding CanEditSettings}" Margin="0,0,0,16" />
+                                    <TextBlock x:Name="UpdateStatusLabel" Text="{local:L A008}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <ProgressBar x:Name="UpdateProgressBar" Minimum="0" Maximum="100" Height="5" Visibility="Collapsed" Margin="0,0,0,14" />
+                                    <WrapPanel Margin="0,0,0,28">
+                                        <Button x:Name="CheckUpdatesButton" Content="{local:L A009}" Tag="check-updates" Click="OnActionClick" />
+                                        <Button x:Name="DownloadUpdateButton" Content="{local:L A010}" Tag="download-update" Click="OnActionClick" Visibility="Collapsed" Margin="8,0,0,0" />
+                                        <Button x:Name="InstallUpdateButton" Content="{local:L A011}" Tag="install-update" Click="OnActionClick" Visibility="Collapsed" Margin="8,0,0,0" IsEnabled="{Binding CanEditSettings}" />
+                                        <Button x:Name="CancelUpdateButton" Content="{local:L A012}" Tag="cancel-update" Click="OnActionClick" Visibility="Collapsed" Margin="8,0,0,0" />
+                                        <Button x:Name="SkipUpdateButton" Content="{local:L A018}" Tag="skip-update" Click="OnActionClick" Visibility="Collapsed" Margin="8,0,0,0" />
+                                    </WrapPanel>
+                                    <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="0,22,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="{local:L A013}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                            <TextBlock Text="{local:L A014}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                            <TextBlock Text="{local:L A015}" TextWrapping="Wrap" Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                                            <TextBlock Text="{local:L A016}" TextWrapping="Wrap" Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                                            <Button Content="{local:L A019}" Tag="third-party-notices" Click="OnActionClick" HorizontalAlignment="Left" Margin="0,0,0,14" />
+                                            <TextBlock Text="{local:L A017}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+        <Border x:Name="ConfigurationFooter" Grid.Row="1" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="0,14,0,0" Margin="236,0,40,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="SettingsValidationLabel" Foreground="#B34B41" FontSize="12" TextWrapping="Wrap" Visibility="Collapsed" />
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Hint}">
+                                <Setter Property="Text" Value="{local:L T222}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SettingsDirty}" Value="True">
+                                        <Setter Property="Text" Value="{local:L T223}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+                <Button Grid.Column="1" Content="{local:L T052}" Tag="discard-settings" Click="OnActionClick" Style="{StaticResource TextButton}" IsEnabled="{Binding SettingsDirty}" Margin="12,0,10,0" />
+                <Button Grid.Column="2" Content="{local:L T053}" Tag="save-settings" Click="OnActionClick" MinWidth="112">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding CanEditSettings}" Value="True" />
+                                        <Condition Binding="{Binding SettingsDirty}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=NavigationTabs, Path=SelectedItem.Tag}" Value="configuration" />
+                                <Condition Binding="{Binding SettingsDirty}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=VocabularyPage, Path=IsSelected}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+    </Grid>
+</Window>
+

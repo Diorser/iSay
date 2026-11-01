@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.24)
+project(IsayTextServiceSetup LANGUAGES CXX)
+add_executable(IsayTextServiceSetup Setup.cpp)
+target_compile_features(IsayTextServiceSetup PRIVATE cxx_std_20)
+target_compile_definitions(IsayTextServiceSetup PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_compile_options(IsayTextServiceSetup PRIVATE /W4 /utf-8 /permissive- /EHsc)
+target_link_libraries(IsayTextServiceSetup PRIVATE ole32 oleaut32 uuid advapi32 user32)
+set_target_properties(IsayTextServiceSetup PROPERTIES OUTPUT_NAME "iSay.TextService.Setup")

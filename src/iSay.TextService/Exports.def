@@ -1,0 +1,5 @@
+LIBRARY "iSay.TextService.dll"
+EXPORTS
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE
+    IsayTsfGetObjectCounts PRIVATE

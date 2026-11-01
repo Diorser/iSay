@@ -1,0 +1,17 @@
+iSay 第三方依赖说明 / Third-party dependency notices
+
+桌面程序依赖 Microsoft .NET 10 Windows Desktop Runtime、WPF、NAudio 与 UI Automation 互操作程序集。
+微软运行时原始安装器按微软发布元数据、SHA512 与 Authenticode 签名验证后随完整包携带。原始许可与权利归微软所有。
+原生 TSF、维护程序和识别依赖还需要 Visual C++ v14 x64/x86 运行库，完整包携微软官方签名原始安装器。其再分发按 Visual Studio 许可条件独立确认。
+
+原生语音、整理、个性化及词典组件基于现有豆包输入法相关二进制与本地适配器。
+这些组件及商标属于各自权利人。自有名称不表示第三方授权、背书或这些二进制已按开源许可发布。
+公开上传安装包或源码前，仍须完成逐项许可和再分发权限核查。当前构建只供本地验证。
+原始 DLL 的加载名称、协议字段和兼容路径属于技术合同，不能通过改名来改变其许可归属。
+
+Native speech, formatting, personalization and dictionary components use existing third-party binaries and local adapters.
+Their names, trademarks and rights belong to their respective owners. Redistribution rights require separate verification before public release.
+
+构建工具参考 LiteMonitor 的发布流程。其去敏参考副本保留供结构对照，不作为原项目许可授权。
+Inno Setup 编译器来自 Tools.InnoSetup 再分发包，执行前验证原发布者 Authenticode 签名。
+Inno Setup 的商业使用条件应在正式商业发布前按官方许可独立确认：https://jrsoftware.org/isorder.php
