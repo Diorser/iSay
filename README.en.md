@@ -6,7 +6,7 @@ Turn your thoughts into text, with your voice.
 
 iSay is a Windows voice input tool. Press a shortcut to start speaking, see text appear in supported input fields, and press it again to finish. It includes text formatting, a personal vocabulary, a floating recording bar, and Chinese and English interfaces.
 
-[Source](https://github.com/Diorser/iSay) · [Issues](https://github.com/Diorser/iSay/issues) · [Build guide (Chinese)](./docs/公开/使用与构建.md) · [Privacy and dependencies (Chinese)](./docs/公开/隐私与第三方依赖.md)
+[Website](https://isay-voice.pages.dev/?lang=en) · [Source](https://github.com/Diorser/iSay) · [Issues](https://github.com/Diorser/iSay/issues) · [Build guide (Chinese)](./docs/公开/使用与构建.md) · [Privacy and dependencies (Chinese)](./docs/公开/隐私与第三方依赖.md)
 
 [![Source build](https://github.com/Diorser/iSay/actions/workflows/%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA.yml/badge.svg)](https://github.com/Diorser/iSay/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 
@@ -62,7 +62,7 @@ These commands build the managed source. They do not register the input componen
 
 ## Status
 
-This is an evolving source preview. Isolated source builds and regression checks for update security and file transactions have passed. **Clean installation and real microphone recognition in the Windows 10 VM still need acceptance testing.** Extended resource testing is also incomplete; final CPU, memory, and stability claims are not made yet. Transaction rollback does not include automatic rollback based on post-launch application health checks.
+This is an evolving source preview. Isolated source builds and regression checks for update security and file transactions have passed. **Clean installation and real microphone recognition in the Windows 10 VM still need acceptance testing.** An isolated 0.10.0 instance completed 100 start/stop cycles, 30 minutes of fixed-audio recognition and eight hours idle, meeting the measured idle CPU and memory budgets. This excludes real microphones, in-host TSF, formatting and learning, so full-scenario stability remains unverified. Transaction rollback does not include automatic rollback based on post-launch application health checks.
 
 When opening an [issue](https://github.com/Diorser/iSay/issues), include the Windows version, iSay version, target application, and reproduction steps. Remove audio, transcription content, vocabulary, accounts, keys, and personal paths from attached diagnostics.
 

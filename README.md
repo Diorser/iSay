@@ -6,7 +6,7 @@
 
 iSay 是一款面向 Windows 的语音输入工具：按下快捷键开始说话，在支持的输入框中实时呈现文字，再按一次完成输入。支持智能整理、个人词典、悬浮录音条和中英文界面。
 
-[查看源码](https://github.com/Diorser/iSay) · [反馈问题](https://github.com/Diorser/iSay/issues) · [使用与构建](./docs/公开/使用与构建.md) · [隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)
+[官网](https://isay-voice.pages.dev/) · [查看源码](https://github.com/Diorser/iSay) · [反馈问题](https://github.com/Diorser/iSay/issues) · [使用与构建](./docs/公开/使用与构建.md) · [隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)
 
 [![源码构建](https://github.com/Diorser/iSay/actions/workflows/%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA.yml/badge.svg)](https://github.com/Diorser/iSay/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 
@@ -62,7 +62,7 @@ dotnet build src/iSay.ReleaseTool/iSay.ReleaseTool.csproj -c Release
 
 ## 当前状态
 
-本次公开的是持续完善中的源码预览。独立源码编译、更新安全及文件事务等回归已完成；**Windows 10 虚拟机的新机安装和真实麦克风识别仍待验收**，长时间资源测试也尚未全部完成，暂不作 CPU、内存和稳定性的最终承诺。文件事务回滚不包含“新版本启动后自动健康检查并回退”。
+本次公开的是持续完善中的源码预览。独立源码编译、更新安全及文件事务等回归已完成；隔离的 0.10.0 实例已完成 100 次启停、30 分钟固定音频识别和 8 小时空闲测试，空闲 CPU 与内存符合本次预算。该测试不包含真实麦克风、输入宿主中的 TSF、智能整理或学习，**Windows 10 虚拟机的新机安装和真实麦克风识别仍待验收**，暂不作完整场景稳定性的最终承诺。文件事务回滚不包含“新版本启动后自动健康检查并回退”。
 
 请在 [Issues](https://github.com/Diorser/iSay/issues) 中描述 Windows 版本、iSay 版本、输入应用和复现步骤。提交日志前，请移除音频、转写正文、词库、账号、密钥和个人路径。
 

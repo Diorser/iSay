@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://isay-voice.pages.dev/sitemap.xml
