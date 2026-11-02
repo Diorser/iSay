@@ -31,6 +31,11 @@ jobs:
           }
       - name: 检查更新文件服务
         run: node test/发行打包回归/Worker回归.mjs
+      - name: 检查官网下载入口
+        run: node test/官网下载入口回归/官网入口回归.mjs
+      - name: 检查独立安装包发布
+        shell: pwsh
+        run: ./test/安装包下载发布回归/安装包下载发布回归.ps1
       - name: 构建双架构输入组件
         shell: pwsh
         run: |

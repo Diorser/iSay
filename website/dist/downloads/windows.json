@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "status": "available",
+  "version": "0.10.1",
+  "channel": "preview",
+  "architecture": "win-x64",
+  "fileName": "iSay-0.10.1-win-x64-full.exe",
+  "bytes": 201508976,
+  "sha256": "e1b82ebba0a65db79bbb9e7c4bff12383e6a1d35e3fe4338e176b9d025b8d61d",
+  "authenticode": "NotSigned",
+  "url": "https://github.com/Diorser/iSay/releases/download/v0.10.1-installer-preview/iSay-0.10.1-win-x64-full.exe",
+  "releaseUrl": "https://github.com/Diorser/iSay/releases/tag/v0.10.1-installer-preview",
+  "automaticUpdatesEnabled": false,
+  "thirdPartyRightsVerified": false,
+  "unverifiedThirdPartyRightsAcknowledged": true,
+  "sourceRevision": "0bbe4cd8e7e7f6e4d214bd38ff9b7f8219789c58",
+  "roundTripHashVerified": true
+}

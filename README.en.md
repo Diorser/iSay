@@ -6,11 +6,17 @@ Turn your thoughts into text, with your voice.
 
 iSay is a Windows voice input tool. Press a shortcut to start speaking, see text appear in supported input fields, and press it again to finish. It includes text formatting, a personal vocabulary, a floating recording bar, and Chinese and English interfaces.
 
-[Website](https://isay-voice.pages.dev/?lang=en) · [Source](https://github.com/Diorser/iSay) · [Issues](https://github.com/Diorser/iSay/issues) · [Build guide (Chinese)](./docs/公开/使用与构建.md) · [Privacy and dependencies (Chinese)](./docs/公开/隐私与第三方依赖.md)
+[Website](https://isay-voice.pages.dev/?lang=en) · [Source](https://github.com/Diorser/iSay) · [Issues](https://github.com/Diorser/iSay/issues) · [Build guide (Chinese)](./docs/公开/使用与构建.md) · [Installer release status (Chinese)](./docs/公开/完整安装包发布说明.md) · [Privacy and dependencies (Chinese)](./docs/公开/隐私与第三方依赖.md)
 
 [![Source build](https://github.com/Diorser/iSay/actions/workflows/%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA.yml/badge.svg)](https://github.com/Diorser/iSay/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 
-> **This is the 0.10.1 source preview.** The repository publishes the project's own desktop client, service adapters, TSF input component, and installation and update tools. Third-party native binaries used by the built-in speech, formatting, personalization, and dictionary adapters are excluded. The source can compile without them, but a fresh clone does not provide every feature. No complete public installer is provided until redistribution rights are confirmed. GitHub's automatic Source code archives are not installers.
+> **Version 0.10.1 is available as a complete installer preview and own-source release.** The full installer includes the current speech, formatting, learning and dictionary components, plus .NET Desktop / VC++ prerequisites installed when needed. Third-party native binaries are outside this project's MIT license; separate redistribution authorization has not been obtained. See the [installer release status (Chinese)](./docs/公开/完整安装包发布说明.md). Clean Windows 10 installation and real microphone recognition remain unverified.
+
+## Download
+
+[Download the Windows x64 full installer · 192.17 MiB](https://github.com/Diorser/iSay/releases/download/v0.10.1-installer-preview/iSay-0.10.1-win-x64-full.exe) · [Release notes and SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.1-installer-preview)
+
+The [website](https://isay-voice.pages.dev/?lang=en) also links to this installer. You do not need to find .NET or VC++ installers separately: the setup checks for prerequisites and installs bundled versions when needed. The installer has no Windows publisher signature yet; client automatic updates are not enabled. GitHub's Source code archives contain source, not an installer.
 
 ## Features
 

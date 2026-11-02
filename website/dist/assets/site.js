@@ -28,14 +28,20 @@
     languageButton.textContent = language === 'zh' ? 'EN' : '中文';
     languageButton.setAttribute('aria-label', language === 'zh' ? 'Switch to English' : '切换到中文');
     document.title = titles[language];
-    document.querySelector('meta[name="description"]').content = descriptions[language];
+    const description = window.iSayReleaseVersion
+      ? (language === 'zh'
+        ? `iSay，面向 Windows 的开源语音输入客户端。完整安装预览 ${window.iSayReleaseVersion} 已提供下载，包含现有组件与环境安装器。`
+        : `iSay is an open-source voice input client for Windows. Complete installer preview ${window.iSayReleaseVersion} is available with components and prerequisites.`)
+      : descriptions[language];
+    document.querySelector('meta[name="description"]').content = description;
     document.querySelector('meta[property="og:title"]').content = titles[language];
-    document.querySelector('meta[property="og:description"]').content = descriptions[language];
+    document.querySelector('meta[property="og:description"]').content = description;
     output.textContent = sentences[language];
     try { window.localStorage.setItem('isay-language', language); } catch { /* 隐私模式禁止存储时保持当前页面语言。 */ }
   }
 
   languageButton.addEventListener('click', () => setLanguage(language === 'zh' ? 'en' : 'zh'));
+  window.addEventListener('isay:release-ready', () => setLanguage(language));
   let initialLanguage = 'zh';
   try { initialLanguage = window.localStorage.getItem('isay-language') || 'zh'; } catch { /* 无法读取存储时默认显示中文。 */ }
   if (new URLSearchParams(window.location.search).get('lang') === 'en') initialLanguage = 'en';

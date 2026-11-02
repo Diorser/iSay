@@ -11,9 +11,10 @@ $scriptFiles = @('scripts/构建组合输入组件.ps1', 'scripts/构建组合�
     'scripts/安装/iSay安装包.iss', 'scripts/发布/构建Windows发行.ps1', 'scripts/发布/发行公共函数.ps1',
     'scripts/发布/原生发行冻结清单.json', 'scripts/发布/第三方依赖声明.txt', 'scripts/发布/简体中文安装语言.isl',
     'scripts/发布/准备发行工具.ps1', 'scripts/发布/准备桌面运行时.ps1', 'scripts/发布/准备VC运行时.ps1',
-    'scripts/发布/发布Windows版本.ps1', 'scripts/发布/Cloudflare/worker.mjs',
+    'scripts/发布/发布Windows版本.ps1', 'scripts/发布/发布完整安装包.ps1', 'scripts/发布/下载GitHub发行资产.ps1', 'scripts/发布/Cloudflare/worker.mjs',
     'scripts/发布/Cloudflare/wrangler.jsonc', 'scripts/发布/Cloudflare/使用说明.md',
-    'test/发行打包回归/Worker回归.mjs', 'test/开源发布检查/检查公开源码.ps1', 'test/开源发布检查/验证独立编译.ps1')
+    'test/发行打包回归/Worker回归.mjs', 'test/开源发布检查/检查公开源码.ps1', 'test/开源发布检查/验证独立编译.ps1',
+    'test/安装包下载发布回归/安装包下载发布回归.ps1', 'test/官网下载入口回归/官网入口回归.mjs')
 $sourceExtensions = @('.cs','.cpp','.h','.rc','.def','.csproj','.xaml','.manifest','.md','.json','.jsonc',
     '.ps1','.py','.mjs','.js','.iss','.isl','.txt','.toml','.svg','.png','.ico')
 $publicFiles = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)

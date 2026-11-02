@@ -6,12 +6,14 @@ iSay 第三方依赖说明 / Third-party dependency notices
 
 原生语音、整理、个性化及词典组件基于现有豆包输入法相关二进制与本地适配器。
 这些组件及商标属于各自权利人。自有名称不表示第三方授权、背书或这些二进制已按开源许可发布。
-公开上传安装包或源码前，仍须完成逐项许可和再分发权限核查。当前构建只供本地验证。
+自有源码按项目 MIT 许可公开；第三方二进制不适用该许可。完整安装预览包含这些组件，尚未取得单独再分发授权，相关修改、分发及服务使用范围仍未核实。维护者已知该情况仍选择发布预览版。
 原始 DLL 的加载名称、协议字段和兼容路径属于技术合同，不能通过改名来改变其许可归属。
 
 Native speech, formatting, personalization and dictionary components use existing third-party binaries and local adapters.
-Their names, trademarks and rights belong to their respective owners. Redistribution rights require separate verification before public release.
+Their names, trademarks and rights belong to their respective owners. Separate redistribution authorization has not been obtained. Modification, redistribution and service-use rights remain unverified; the maintainer has chosen to publish a preview with this limitation disclosed.
 
 构建工具参考 LiteMonitor 的发布流程。其去敏参考副本保留供结构对照，不作为原项目许可授权。
 Inno Setup 编译器来自 Tools.InnoSetup 再分发包，执行前验证原发布者 Authenticode 签名。
-Inno Setup 的商业使用条件应在正式商业发布前按官方许可独立确认：https://jrsoftware.org/isorder.php
+Inno Setup 官方许可允许商业用途、修改与再分发，需保留版权、来源及修改说明；官方 FAQ 明确购买商业许可证并非强制要求，不应将未购买当成安装器不能发布的原因。
+官方许可：https://github.com/jrsoftware/issrc/blob/is-6_7_3/license.txt
+商业支持与FAQ：https://jrsoftware.org/isorder.php

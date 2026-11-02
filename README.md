@@ -6,17 +6,23 @@
 
 iSay 是一款面向 Windows 的语音输入工具：按下快捷键开始说话，在支持的输入框中实时呈现文字，再按一次完成输入。支持智能整理、个人词典、悬浮录音条和中英文界面。
 
-[官网](https://isay-voice.pages.dev/) · [查看源码](https://github.com/Diorser/iSay) · [反馈问题](https://github.com/Diorser/iSay/issues) · [使用与构建](./docs/公开/使用与构建.md) · [隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)
+[官网](https://isay-voice.pages.dev/) · [查看源码](https://github.com/Diorser/iSay) · [反馈问题](https://github.com/Diorser/iSay/issues) · [使用与构建](./docs/公开/使用与构建.md) · [完整安装包说明](./docs/公开/完整安装包发布说明.md) · [隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)
 
 [![源码构建](https://github.com/Diorser/iSay/actions/workflows/%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA.yml/badge.svg)](https://github.com/Diorser/iSay/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 
-> **当前为 0.10.1 源码预览。** 本仓库公开桌面客户端、语音适配层、TSF 输入组件和安装更新工具的自有源码。内置识别、智能整理、个性化与词典依赖的第三方原生二进制未随仓库分发；源码可以编译，不代表克隆后即可使用全部功能。第三方再分发权限确认前，不提供公开完整安装包。GitHub 自动生成的 Source code 压缩包不是安装器。
+> **当前提供 0.10.1 完整安装预览版和自有源码。** 完整包包含现有识别、整理、学习、词典组件，以及按需安装的 .NET Desktop / VC++ 环境。第三方原生组件不属于本项目 MIT 范围，单独再分发授权尚未取得；详情见[完整安装包说明](./docs/公开/完整安装包发布说明.md)。Windows 10 新机安装与真实麦克风识别仍待验收，请先试用预览版。
+
+## 下载
+
+[下载 Windows x64 完整安装包 · 192.17 MiB](https://github.com/Diorser/iSay/releases/download/v0.10.1-installer-preview/iSay-0.10.1-win-x64-full.exe) · [发行说明与 SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.1-installer-preview)
+
+也可从[官网](https://isay-voice.pages.dev/)进入下载。无需预先另找 .NET 或 VC++ 安装器；安装向导会检测并按需安装随包环境。当前安装器未签 Windows 发布者签名，客户端自动更新服务尚未启用。GitHub 的 Source code 压缩包是源码，不是安装器。
 
 ## 功能
 
 | 功能 | 说明 |
 |---|---|
-| 语音输入 | 麦克风选择、快捷键启停、实时识别状态和悬浮录音条。内置语音适配器需另备合法可用的第三方组件及服务条件。 |
+| 语音输入 | 麦克风选择、快捷键启停、实时识别状态和悬浮录音条。完整安装包已含现有第三方组件；源码构建需另备组件，远端服务仍需可用。 |
 | 输入框集成 | 自有 Windows TSF 组件提供组合文本输入；可切换普通文本兼容模式。不同应用的输入框支持情况需要分别验证。 |
 | 智能整理 | 基础文本处理、标点与间距偏好、内置整理适配器，以及可配置的兼容 AI 接口。 |
 | 个人词典 | 词条管理、纠错与可选学习；部分能力依赖第三方原生组件。额外联网学习默认关闭。 |
