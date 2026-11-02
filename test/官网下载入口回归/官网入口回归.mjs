@@ -92,7 +92,8 @@ async function staysSource(name, release, options = {}) {
 if (configuredRelease.status === 'available') {
   const configured = await run(configuredRelease);
   assert.equal(configuredRelease.roundTripHashVerified, true, '已公开配置必须记录完整回下载核验');
-  assert.equal(configured.button.href, valid.url, '当前配置必须指向实际公开的安装器');
+  const expectedInstaller = `https://github.com/Diorser/iSay/releases/download/v${configuredRelease.version}-installer-preview/iSay-${configuredRelease.version}-win-x64-full.exe`;
+  assert.equal(configured.button.href, expectedInstaller, '当前配置必须指向对应版本的公开安装器');
   count += 1;
 } else {
   await staysSource('当前官网配置', configuredRelease);
