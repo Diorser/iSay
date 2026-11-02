@@ -16,7 +16,7 @@ $scriptFiles = @('scripts/构建组合输入组件.ps1', 'scripts/构建组合�
     'scripts/发布/Cloudflare/wrangler.jsonc', 'scripts/发布/Cloudflare/使用说明.md',
     'test/发行打包回归/Worker回归.mjs', 'test/开源发布检查/检查公开源码.ps1', 'test/开源发布检查/验证独立编译.ps1',
     'test/安装包下载发布回归/安装包下载发布回归.ps1', 'test/官网下载入口回归/官网入口回归.mjs',
-    'test/官网SEO回归/官网SEO回归.py', 'test/产品宣传截图/Program.cs',
+    'test/官网SEO回归/官网SEO回归.py', 'test/官网SEO回归/线上官网验收.py', 'test/产品宣传截图/Program.cs',
     'test/产品宣传截图/产品宣传截图.csproj', 'test/产品宣传截图/截图生成说明.md',
     'scripts/发布/提交搜索收录.py', 'website/生成官网.py', 'website/官网维护说明.md', 'website/搜索与AI发现说明.md',
     'README.md', 'README.en.md')

@@ -5,6 +5,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 import argparse
 import json
+import re
 import secrets
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -13,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / 'website/dist'
 STATE = ROOT / 'artifacts/搜索收录'
 CONFIG = STATE / 'IndexNow本机配置.json'
+HEADERS = {'User-Agent': 'iSay-site-publisher/1.0'}
 
 
 def main():
@@ -37,6 +39,8 @@ def main():
         key = secrets.token_hex(16)
         config = {'host': address.hostname, 'key': key, 'keyLocation': base + '/indexnow-' + key + '.txt'}
         CONFIG.write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    if not re.fullmatch('[a-f0-9]{32}', config.get('key', '')) or config['keyLocation'] != base + '/indexnow-' + config['key'] + '.txt':
+        raise ValueError('本机验证配置不符合本站预期地址或格式。')
     key_file = DIST / Path(urlparse(config['keyLocation']).path).name
     if args.prepare:
         key_file.write_text(config['key'], encoding='utf-8')
@@ -44,7 +48,7 @@ def main():
         return
 
     # 验证文件只用于该站点公开所有权，不是 Cloudflare 或其他服务的访问凭据。
-    with urlopen(config['keyLocation'], timeout=30) as response:
+    with urlopen(Request(config['keyLocation'], headers=HEADERS), timeout=30) as response:
         if response.read(1024).decode('utf-8-sig').strip() != config['key']:
             raise ValueError('线上站点验证文件内容不匹配，尚未提交。')
     sitemap = ET.fromstring((DIST / 'sitemap.xml').read_text(encoding='utf-8'))
@@ -55,7 +59,7 @@ def main():
         target = urlparse(url)
         if target.scheme != 'https' or target.netloc != address.netloc or target.query or target.fragment:
             raise ValueError('仅允许提交本站规范 URL。')
-        with urlopen(url, timeout=30) as response:
+        with urlopen(Request(url, headers=HEADERS), timeout=30) as response:
             if response.status != 200 or urlparse(response.url).netloc != address.netloc:
                 raise ValueError('规范产品页线上不可用，尚未提交。')
     body = json.dumps({**config, 'urlList': urls}).encode('utf-8')
