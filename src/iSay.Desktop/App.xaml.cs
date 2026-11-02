@@ -107,6 +107,21 @@ public partial class App : Application
             });
             return;
         }
+        var launchEnvironment = IndependentProcessLauncher.CaptureEnvironment();
+        string? independentLaunchError = null;
+        // 隔离测试与单次控制命令不派生常驻实例；正式运行在获取单实例锁前脱离工具作业组。
+        if (launchEnvironment.KillOnJobClose && !e.Args.Contains(IndependentProcessLauncher.IndependentMarker) &&
+            !e.Args.Contains("--test-data") && !e.Args.Contains("--test-preview") && !e.Args.Contains("--quit") && !e.Args.Contains("--toggle"))
+        {
+            try
+            {
+                IndependentProcessLauncher.StartDetached(Environment.ProcessPath ?? throw new InvalidOperationException("无法确定 iSay 程序路径。"),
+                    e.Args.Append(IndependentProcessLauncher.IndependentMarker).ToArray(), Environment.CurrentDirectory);
+                Shutdown(); return;
+            }
+            catch (Exception error) when (error is System.ComponentModel.Win32Exception or InvalidOperationException or ArgumentException or TimeoutException)
+            { independentLaunchError = error.Message; }
+        }
         var instanceIndex = Array.IndexOf(e.Args, "--instance");
         var instanceName = instanceIndex >= 0 && instanceIndex + 1 < e.Args.Length ? e.Args[instanceIndex + 1] : "main";
         if (!System.Text.RegularExpressions.Regex.IsMatch(instanceName, "^[a-zA-Z0-9_-]{1,40}$")) { Shutdown(); return; }
@@ -122,6 +137,9 @@ public partial class App : Application
         var dataIndex = Array.IndexOf(e.Args, "--test-data");
         store = new SettingsStore(dataIndex >= 0 && dataIndex + 1 < e.Args.Length ? e.Args[dataIndex + 1] : null);
         InitializeLifetimeJournal(e.Args.Contains("--background"));
+        lifetimeJournal?.Record("启动环境", new { launchEnvironment.InJob, launchEnvironment.KillOnJobClose,
+            launchEnvironment.BreakawayAllowed, launchEnvironment.LimitFlags, launchEnvironment.QueryError,
+            IndependentLaunch = e.Args.Contains(IndependentProcessLauncher.IndependentMarker), Error = independentLaunchError });
         showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, instancePrefix + "Show");
         exitSignal = new EventWaitHandle(false, EventResetMode.AutoReset, instancePrefix + "Exit");
         toggleSignal = new EventWaitHandle(false, EventResetMode.AutoReset, instancePrefix + "Toggle");
@@ -192,6 +210,7 @@ public partial class App : Application
         input.ChromiumRangeSyncEnabled = savedSettings.ChromiumRangeSyncEnabled;
         delivery = new CompositionDeliveryRouter(input);
         delivery.PipeDiagnostic += OnCompositionDiagnostic;
+        delivery.CleanupDiagnostic += detail => LogEvent("交付清理", detail);
         input.Diagnostic += (_, detail) => LogEvent("输入核验", $"阶段={detail.Stage};匹配={detail.MatchKind};焦点={detail.FocusIdentity};预期长度={detail.ExpectedLength};实际长度={detail.ActualLength};耗时毫秒={detail.ElapsedMilliseconds};最终={detail.IsFinal};旧快照长度={detail.PreviousSnapshotLength};新快照长度={detail.NextSnapshotLength};已发快照长度={detail.SentSnapshotLength};保留前缀长度={detail.KeptPrefixLength};编辑起点={detail.EditStart};删除长度={detail.RemovedLength};实际插入长度={detail.InsertedLength}");
         input.RecordingRequested += (_, action) => Dispatcher.BeginInvoke(async () => await HandleRecordingHotkeyAsync(action.Action));
         input.InputActivity += (_, _) => QueueInputActivity();

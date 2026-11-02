@@ -11,5 +11,7 @@
     <Project Path="test/配置恢复回归测试/配置恢复回归测试.csproj" />
     <Project Path="test/更新安全回归/更新安全回归.csproj" />
     <Project Path="test/发行发布预检回归/发行发布预检回归.csproj" />
+    <Project Path="test/TSF桥接回归/TSF桥接回归.csproj" />
+    <Project Path="test/独立常驻启动回归/独立常驻启动回归.csproj" />
   </Folder>
 </Solution>

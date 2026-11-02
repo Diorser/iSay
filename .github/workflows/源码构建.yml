@@ -25,7 +25,7 @@ jobs:
       - name: 运行托管回归
         shell: pwsh
         run: |
-          foreach ($suite in @('客户端核心测试', '配置恢复回归测试', '更新安全回归', '发行发布预检回归')) {
+          foreach ($suite in @('客户端核心测试', '配置恢复回归测试', '更新安全回归', '发行发布预检回归', 'TSF桥接回归')) {
             dotnet run --project "test/$suite/$suite.csproj" -c Release --no-build
             if ($LASTEXITCODE -ne 0) { throw "回归失败：$suite" }
           }

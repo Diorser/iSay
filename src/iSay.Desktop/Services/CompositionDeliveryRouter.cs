@@ -1,5 +1,6 @@
 using System.IO;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("iSay.CompositionApp.Tests")]
 
@@ -19,10 +20,12 @@ internal sealed class CompositionDeliveryRouter
     private readonly ICompatibilityInputDelivery compatibility;
     private readonly Func<Guid, ICompositionSession?> captureComposition;
     private readonly SemaphoreSlim serial = new(1, 1);
-    private readonly Queue<DeliverySession> cleanupBacklog = new();
+    private readonly ConcurrentQueue<DeliverySession> cleanupBacklog = new();
+    private readonly object sessionGate = new();
     private DeliverySession? active;
     private readonly Func<Guid, CancellationToken, Task<ICompositionSession?>>? captureEmptyComposition;
     public event Action<TsfPipeDiagnostic>? PipeDiagnostic;
+    public event Action<string>? CleanupDiagnostic;
 
     public CompositionDeliveryRouter(WindowsInputService input)
     {
@@ -107,6 +110,7 @@ internal sealed class CompositionDeliveryRouter
     public async Task<DeliveryResult> BeginAsync(Guid session, bool useComposition, CancellationToken cancellationToken = default)
     {
         if (session == Guid.Empty) throw new ArgumentException("输入会话不能为空。", nameof(session));
+        cancellationToken.ThrowIfCancellationRequested();
         // 工厂在首次等待前捕获当前目标，不能等到识别首字或网络整理完成后再决定输入位置。
         ICompositionSession? composition = null;
         if (useComposition)
@@ -115,12 +119,17 @@ internal sealed class CompositionDeliveryRouter
             catch (Exception error) when (IsDeliveryError(error)) { }
         }
         var next = new DeliverySession(session, useComposition, composition, cancellationToken);
-        var previous = Interlocked.Exchange(ref active, next);
-        previous?.Cancellation.Cancel();
+        lock (sessionGate)
+        {
+            var previous = Volatile.Read(ref active);
+            previous?.Cancellation.Cancel();
+            // 在任何可取消等待之前接管旧会话，防止切换中断后留下无人清理的组合。
+            if (previous is not null) cleanupBacklog.Enqueue(previous);
+            Volatile.Write(ref active, next);
+        }
         await serial.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (previous is not null) cleanupBacklog.Enqueue(previous);
             if (!await DrainCleanupAsync().ConfigureAwait(false))
             {
                 next.Blocked = true;
@@ -261,7 +270,7 @@ internal sealed class CompositionDeliveryRouter
                 if (!current.UseComposition)
                     return final ? await compatibility.CommitAsync(text, token).ConfigureAwait(false) : await compatibility.UpdateAsync(text, token).ConfigureAwait(false);
                 var reply = final ? await current.Composition!.CommitAsync(text, token).ConfigureAwait(false) : await current.Composition!.UpdateAsync(text, token).ConfigureAwait(false);
-                if (reply.State is TsfCompositionState.HostTerminated or TsfCompositionState.Rejected) current.Blocked = true;
+                if (reply.IsDefinitiveTerminal) current.Blocked = true;
                 return ConvertReply(reply, final);
             }, linked.Token, final && !current.UseComposition ? 2600 : 1200).ConfigureAwait(false);
             if (!ReferenceEquals(Volatile.Read(ref active), current)) return Expired();
@@ -279,12 +288,17 @@ internal sealed class CompositionDeliveryRouter
 
     public async Task CancelAsync(Guid session, CancellationToken cancellationToken = default)
     {
-        var current = Volatile.Read(ref active);
-        if (current is null || current.Id != session) return;
-        if (!ReferenceEquals(Interlocked.CompareExchange(ref active, null, current), current)) return;
-        current.Cancellation.Cancel();
+        cancellationToken.ThrowIfCancellationRequested();
+        lock (sessionGate)
+        {
+            var current = Volatile.Read(ref active);
+            if (current is null || current.Id != session) return;
+            current.Cancellation.Cancel();
+            cleanupBacklog.Enqueue(current);
+            Volatile.Write(ref active, null);
+        }
         await serial.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try { cleanupBacklog.Enqueue(current); await DrainCleanupAsync().ConfigureAwait(false); }
+        try { await DrainCleanupAsync().ConfigureAwait(false); }
         finally { serial.Release(); }
     }
 
@@ -327,8 +341,13 @@ internal sealed class CompositionDeliveryRouter
     {
         while (cleanupBacklog.TryPeek(out var previous))
         {
-            if (!await CleanupAsync(previous).ConfigureAwait(false)) return false;
-            cleanupBacklog.Dequeue();
+            if (!await CleanupAsync(previous).ConfigureAwait(false))
+            {
+                CleanupDiagnostic?.Invoke($"旧会话={previous.Id:N};清理未确认;待清理数={cleanupBacklog.Count}");
+                return false;
+            }
+            cleanupBacklog.TryDequeue(out _);
+            CleanupDiagnostic?.Invoke($"旧会话={previous.Id:N};清理已确认;剩余数={cleanupBacklog.Count}");
         }
         return true;
     }
@@ -352,7 +371,10 @@ internal sealed class CompositionDeliveryRouter
                         reply.HResult == 0 && reply.State is TsfCompositionState.Idle or TsfCompositionState.Committed)
                         return cleaned = true;
                     if (reply.HResult != unchecked((int)0x800700AA) && reply.HResult != unchecked((int)0x8000000A) && reply.State != TsfCompositionState.FocusUnavailable)
+                    {
+                        CleanupDiagnostic?.Invoke($"旧会话={session.Id:N};清理拒绝;HRESULT=0x{reply.HResult:X8};状态={reply.State};确认序号={reply.AcceptedSequence}");
                         return false;
+                    }
                 }
                 catch (TsfConfirmationPendingException) { }
                 catch (TsfTransportException error) when (!error.MayHaveReachedHost && error.CanQuery) { }
@@ -365,6 +387,7 @@ internal sealed class CompositionDeliveryRouter
 
     private static DeliveryResult ConvertReply(TsfReply reply, bool final)
     {
+        if (reply.IsPending) return DeliveryResult.Retained("原编辑正在处理，只读等待确认，完整转写保留。", true);
         if (reply.HResult == 0 && reply.State == (final ? TsfCompositionState.Committed : TsfCompositionState.Composing))
             return DeliveryResult.Delivered(final ? "组合文字已提交" : "组合文字已同步");
         return DeliveryResult.Retained(reply.State == TsfCompositionState.FocusUnavailable ?

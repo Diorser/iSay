@@ -14,6 +14,9 @@ internal sealed record TsfReply(int HResult, TsfCompositionState State, int Text
 {
     // S_FALSE 表示命令没有完成；不能把“保留原文”当作已写入。
     public bool Applied => HResult == 0 && State is TsfCompositionState.Composing or TsfCompositionState.Committed or TsfCompositionState.Idle;
+    // 宿主状态是编辑过程中的快照；在途或忙碌回复不能作为永久终态缓存。
+    public bool IsPending => HResult is unchecked((int)0x8000000A) or unchecked((int)0x800700AA);
+    public bool IsDefinitiveTerminal => !IsPending && State is TsfCompositionState.HostTerminated or TsfCompositionState.Rejected;
 }
 
 // 可选的编辑器范围同步；退出任何未确认写入的路径时恢复原选区，不把同步动作当作文字交付成功。
@@ -100,6 +103,25 @@ internal sealed class TsfCompositionClient(TsfEndpoint endpoint, Action<TsfPipeD
     internal const int MaximumTextLength = 1024 * 1024;
     private readonly SemaphoreSlim serial = new(1, 1);
     private readonly TsfEndpoint target = endpoint;
+    private readonly long? ownerStartedUtcTicks = ReadOwnerStartTime(endpoint.ProcessId);
+
+    private static long? ReadOwnerStartTime(uint processId)
+    {
+        try { using var owner = Process.GetProcessById(checked((int)processId)); return owner.StartTime.ToUniversalTime().Ticks; }
+        catch (Exception error) when (error is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception) { return null; }
+    }
+
+    internal bool OwnerHasExited()
+    {
+        try
+        {
+            using var owner = Process.GetProcessById(checked((int)target.ProcessId));
+            return owner.HasExited || ownerStartedUtcTicks is { } started && owner.StartTime.ToUniversalTime().Ticks != started;
+        }
+        catch (ArgumentException) { return true; }
+        // 无权读取不是进程退出的证明；不能仅凭管道超时丢弃仍存活的原组合。
+        catch (Exception error) when (error is InvalidOperationException or System.ComponentModel.Win32Exception) { return false; }
+    }
 
     internal bool HasKnownUnsafeRefinementUndo() => target.HasKnownUnsafeRefinementUndo();
     internal ITsfLearningObserver CreateLearningObserver() => new TsfLearningClient(target);
@@ -224,6 +246,7 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
     private readonly SemaphoreSlim serial = new(1, 1);
     private ulong sequence;
     private bool started, completed, uncertain, terminated, beginAttempted, initialRecoveryAttempted;
+    private bool absentBeginRetryAttempted;
     private long initialRecoveryWaitStartedAt;
     private bool committedSuccessfully, refinementAttempted;
     private Func<bool>? refinementGuard;
@@ -370,15 +393,28 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
         try
         {
             if (completed) return last;
+            if (client.OwnerHasExited())
+            {
+                // 目标进程退出或进程号已复用，旧组合不可能继续写入，不再等待消失的管道。
+                pending = null; uncertain = false; completed = true;
+                return last = new(0, TsfCompositionState.Idle, 0, 0);
+            }
             if (!started && !uncertain) { completed = true; return last = new(0, TsfCompositionState.Idle, 0, sequence); }
-            if (terminated) return last;
+            if (terminated && !last.IsPending) return last;
+            // 清理只确认原会话，不重发正文；暂态的终止外观不能永久卡住后续所有录音。
+            if (terminated) { terminated = false; uncertain = true; }
             // 即使上次回复丢失，也允许明确结束该会话；Cancel 不写正文，不重新建立范围。
             // 原 Cancel 已经可能执行时只查原序号；Busy 表示尚未接受取消，不能冒充已清理。
-            if (pending?.Command == TsfCommand.Cancel) return await ConfirmPendingCore(cancellationToken, true).ConfigureAwait(false);
+            if (pending is not null)
+            {
+                var confirmation = await ConfirmPendingCore(cancellationToken, true).ConfigureAwait(false);
+                if (completed || confirmation.IsDefinitiveTerminal) return confirmation;
+            }
             if (uncertain && pending is null)
             {
                 // 上一轮清理被调用方取消时，空 Cancel 也可能已生效；先只读证明终态再决定是否仍需取消。
                 last = await client.SendAsync(TsfCommand.Query, session, Math.Max(1, sequence), "", cancellationToken).ConfigureAwait(false);
+                if (TryCompleteAbsentSessionCleanup(last)) return last;
                 if (last.State == TsfCompositionState.HostTerminated && last.HResult != PendingHResult && last.HResult != unchecked((int)0x800700AA))
                 { terminated = true; return last; }
                 if (last.HResult == 0 && last.State is TsfCompositionState.Idle or TsfCompositionState.Committed)
@@ -399,7 +435,7 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
             if (completed || !started || terminated) return last;
             var reply = await client.SendAsync(TsfCommand.Query, session, Math.Max(1, sequence), "", cancellationToken).ConfigureAwait(false);
             last = reply;
-            if (reply.State is TsfCompositionState.HostTerminated or TsfCompositionState.Rejected) terminated = true;
+            if (reply.IsDefinitiveTerminal) terminated = true;
             return reply;
         }
         finally { serial.Release(); }
@@ -453,6 +489,7 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
                 {
                     // 宿主已结束组合时必须沿用原范围恢复，不能先选中正文破坏恢复所需的折叠光标。
                     var state = await client.SendAsync(TsfCommand.Query, session, Math.Max(1, sequence), "", cancellationToken).ConfigureAwait(false);
+                    if (state.IsPending) throw new TsfConfirmationPendingException("原编辑仍在处理中，只读等待，不重发正文。");
                     if (state.State == TsfCompositionState.HostTerminated && state.HResult != PendingHResult)
                     {
                         terminated = true;
@@ -499,6 +536,7 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
             if (canWriteOriginal is not null && !await canWriteOriginal(token).ConfigureAwait(false))
                 return new(1, TsfCompositionState.FocusUnavailable, last.TextLength, last.AcceptedSequence);
             var observed = await client.SendAsync(TsfCommand.Query, session, Math.Max(1, sequence), "", token).ConfigureAwait(false);
+            if (observed.IsPending) throw new TsfConfirmationPendingException("首批编辑仍在处理中，只读等待原组合。");
             if (observed.State is TsfCompositionState.HostTerminated or TsfCompositionState.Rejected)
             {
                 last = observed; terminated = true; initialBatchGuardCompleted = true;
@@ -604,12 +642,17 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
         catch (Exception error) when (IsUncertain(error)) { uncertain = true; throw; }
     }
 
-    private async Task<TsfReply> ConfirmPendingCore(CancellationToken cancellationToken, bool resumeCancellation = false)
+    private async Task<TsfReply> ConfirmPendingCore(CancellationToken cancellationToken, bool allowExpiredCleanupQuery = false)
     {
         var expected = pending!;
         var remaining = ConfirmationBudgetMilliseconds - Stopwatch.GetElapsedTime(expected.StartedAt).TotalMilliseconds;
-        // 取消不再写正文；下一次明确清理允许有界查询旧 Cancel 的终态，而不是另发一次取消或永久阻塞。
-        if (remaining <= 0 && resumeCancellation && expected.Command == TsfCommand.Cancel) remaining = 700;
+        // 长时间待机或失焦后，允许一次有界的迟到只读确认；仍不确定则保留正文。
+        // 清理可再次确认，正文恢复最多追加一次查询，不能无限延长原命令预算。
+        if (remaining <= 0 && (allowExpiredCleanupQuery || !expected.LateConfirmationProbed))
+        {
+            if (!allowExpiredCleanupQuery) expected.LateConfirmationProbed = true;
+            remaining = 700;
+        }
         if (remaining <= 0)
             throw new IOException("原组合命令未在确认预算内得到证明，完整转写继续保留。");
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -620,7 +663,17 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
         { throw new IOException("原组合命令未在确认预算内得到证明，完整转写继续保留。"); }
         catch (TsfTransportException error) when (error.CanQuery)
         { throw new TsfConfirmationPendingException("原组合命令暂未确认，只读查询稍后继续。"); }
-        if (reply.State is TsfCompositionState.HostTerminated or TsfCompositionState.Rejected)
+        if (reply.IsPending) throw new TsfConfirmationPendingException("宿主编辑仍未结束，只读等待原命令，不重发正文。");
+        if (allowExpiredCleanupQuery && TryCompleteAbsentSessionCleanup(reply)) return last;
+        if (!allowExpiredCleanupQuery && expected.Command == TsfCommand.Begin && !started && !mayHaveWrittenText &&
+            !absentBeginRetryAttempted && IsAbsentSessionCleanupProof(reply) && canRetryBegin?.Invoke() == true)
+        {
+            // 只重试确证未接受的空初始化；下一轮仍核验原焦点和键鼠版本，绝不重发已经可能写入的正文。
+            absentBeginRetryAttempted = true; pending = null; uncertain = false;
+            last = new(0, TsfCompositionState.Idle, 0, 0);
+            throw new TsfConfirmationPendingException("空初始化未被接受，下一轮仅在原焦点未变时重试一次。", true);
+        }
+        if (reply.IsDefinitiveTerminal)
         {
             pending = null; uncertain = false; terminated = true; last = reply; return reply;
         }
@@ -641,9 +694,24 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
         throw new IOException("原组合回复的序号、长度或状态不一致，未继续改写输入框。");
     }
 
+    private bool TryCompleteAbsentSessionCleanup(TsfReply reply)
+    {
+        // 原生查询在待授锁或重入时先返回在途/忙碌；会话不匹配才返回拒绝访问且确认序号为零。
+        // 初始化取消后可能仍保留上一段的已提交状态，不能把这类回复永久留在全局清理队列。
+        // 仅用于清理，且要求没有活动组合；绝不将它作为旧正文写入成功的证明，也不向其他会话发取消。
+        if (!IsAbsentSessionCleanupProof(reply)) return false;
+        pending = null; uncertain = false; completed = true;
+        last = new(0, TsfCompositionState.Idle, 0, 0);
+        return true;
+    }
+
+    private static bool IsAbsentSessionCleanupProof(TsfReply reply) => reply.AcceptedSequence == 0 &&
+        (reply.HResult == 0 && reply.State == TsfCompositionState.Idle ||
+        reply.HResult == unchecked((int)0x80070005) && reply.State is TsfCompositionState.Idle or TsfCompositionState.Committed);
+
     private void RecordAcknowledgement(PendingWrite request, TsfReply reply)
     {
-        if (reply.State is TsfCompositionState.HostTerminated or TsfCompositionState.Rejected) terminated = true;
+        if (reply.IsDefinitiveTerminal) terminated = true;
         if (reply.HResult == 0 && reply.AcceptedSequence == request.Sequence)
         {
             if (request.Command == TsfCommand.Begin && reply.State is TsfCompositionState.Composing or TsfCompositionState.FocusUnavailable)
@@ -669,5 +737,8 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
 
     private TsfReply Rejected() => new(unchecked((int)0x8007139F), TsfCompositionState.Rejected, last.TextLength, sequence);
     private static bool IsUncertain(Exception error) => error is IOException or TimeoutException or OperationCanceledException or UnauthorizedAccessException;
-    private sealed record PendingWrite(TsfCommand Command, ulong Sequence, string Text, long StartedAt);
+    private sealed record PendingWrite(TsfCommand Command, ulong Sequence, string Text, long StartedAt)
+    {
+        public bool LateConfirmationProbed { get; set; }
+    }
 }

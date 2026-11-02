@@ -6,7 +6,8 @@ if (-not $ReportDirectory) { $ReportDirectory = Join-Path $PSScriptRoot ('检查
 New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
 $sourceDirectories = @('src/iSay.Desktop', 'src/iSay.Voice', 'src/iSay.Updates', 'src/iSay.Updater',
     'src/iSay.ReleaseTool', 'src/iSay.TextService', 'src/iSay.TextService.Setup')
-$testDirectories = @('test/更新安全回归', 'test/发行发布预检回归', 'test/客户端核心测试', 'test/配置恢复回归测试')
+$testDirectories = @('test/更新安全回归', 'test/发行发布预检回归', 'test/客户端核心测试', 'test/配置恢复回归测试',
+    'test/TSF桥接回归', 'test/独立常驻启动回归')
 $scriptFiles = @('scripts/构建组合输入组件.ps1', 'scripts/构建组合输入安装器.ps1',
     'scripts/安装/iSay安装包.iss', 'scripts/发布/构建Windows发行.ps1', 'scripts/发布/发行公共函数.ps1',
     'scripts/发布/原生发行冻结清单.json', 'scripts/发布/第三方依赖声明.txt', 'scripts/发布/简体中文安装语言.isl',
