@@ -7,7 +7,7 @@
   "repository": "https://github.com/Diorser/iSay",
   "maintainer": "Diorser",
   "updated": "2026-11-03",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "releaseChannel": "installer-preview",
   "platform": [
     "Windows 10 2004+ x64",
@@ -18,12 +18,12 @@
     "currency": "CNY",
     "policy": "iSay 桌面产品永久免费；第三方服务额度、可用性及主动配置的 API 费用由服务商决定。"
   },
-  "downloadUrl": "https://github.com/Diorser/iSay/releases/download/v0.10.5-installer-preview/iSay-0.10.5-win-x64-full.exe",
-  "releaseUrl": "https://github.com/Diorser/iSay/releases/tag/v0.10.5-installer-preview",
-  "sha256": "c61ab1b4a24564662a07465c8275026873b7b7b40e4f1364c9a5dd19100466b0",
-  "installerBytes": 201514741,
+  "downloadUrl": "https://github.com/Diorser/iSay/releases/download/v0.10.6-installer-preview/iSay-0.10.6-win-x64-full.exe",
+  "releaseUrl": "https://github.com/Diorser/iSay/releases/tag/v0.10.6-installer-preview",
+  "sha256": "23cc1088a34122f2f5efb559fbd4873fd10cdcc59edeb2c99fa7286caa162781",
+  "installerBytes": 201552366,
   "features": [
-    "中文语音输入",
+    "多语言语音输入",
     "RightAlt 快捷键启停",
     "智能整理与原文对照",
     "个人词典及纠错",
@@ -44,12 +44,11 @@
     "输入框兼容性因应用而异",
     "Win10新机安装及真实麦克风识别待复验",
     "安装器未签Windows发布者签名",
-    "自动更新未启用",
     "第三方原生组件单独再分发授权尚未取得，不属于iSay自有MIT许可范围"
   ],
-  "automaticUpdatesEnabled": false,
+  "automaticUpdatesEnabled": true,
   "screenshots": {
-    "note": "真实0.10.5界面，内容为演示数据。",
+    "note": "真实0.10.6界面，内容为演示数据。",
     "urls": [
       "https://isay-voice.pages.dev/assets/screenshots/voice-input.png",
       "https://isay-voice.pages.dev/assets/screenshots/raw-input.png",

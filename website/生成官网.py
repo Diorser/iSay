@@ -18,12 +18,12 @@ UPDATE_ZH = '默认自动检查更新，也可在设置最后的“关于”页�
 UPDATE_EN = 'Automatic checks are enabled. Check, download and install app updates in Settings > About; native component changes require the full installer.' if AUTO_UPDATES else 'Automatic updates are not enabled, so download manually from this site or GitHub Releases.'
 SIZE_MIB = f"{RELEASE['bytes'] / 1048576:.2f}"
 DOWNLOAD = RELEASE['url']
-SOCIAL = BASE + '/assets/screenshots/social-preview.png?v=20261103-slogan1'
+SOCIAL = BASE + '/assets/screenshots/social-preview.png?v=20261103-slogan2'
 
 FAQ = [
     ('iSay 是什么？', 'What is iSay?',
-     'iSay 是面向 Windows 的中文语音输入法。用快捷键开始说话，在支持的输入框中输入文字，再用智能整理、个人词典和本地历史继续处理表达。',
-     'iSay is a Chinese voice input app for Windows. Start speaking with a hotkey, enter text in supported fields, and work with refinement, a personal vocabulary and local history.'),
+     'iSay 是面向 Windows、支持多语言语音输入的语音输入法。用快捷键开始说话，在支持的输入框中输入文字，再用智能整理、个人词典和本地历史继续处理表达。',
+     'iSay is a multilingual voice input app for Windows. Start speaking with a hotkey, enter text in supported fields, and work with refinement, a personal vocabulary and local history.'),
     ('真的永久免费吗？', 'Is iSay really free forever?',
      '是。iSay 桌面产品永久免费，不收取 iSay 订阅费。免费承诺覆盖产品本身；如果主动配置第三方语音或 AI 接口，服务商可能另行计费。上游服务的可用性、额度与条款由其提供方决定。',
      'Yes. The iSay desktop app is free forever, with no iSay subscription. This promise covers the app itself. Optional third-party speech or AI APIs may charge separately, and upstream availability, quotas and terms remain with their providers.'),
@@ -86,7 +86,7 @@ def page(language):
          'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'CNY', 'url': canonical + '#download'},
          'image': SOCIAL, 'screenshot': [BASE + '/assets/screenshots/' + n + '.png' for n in ['voice-input', 'history', 'dictionary', 'settings']],
          'author': {'@id': BASE + '/#author'}, 'inLanguage': ['zh-CN', 'en'],
-         'featureList': choose(['中文语音输入', '快捷键启停', '智能整理', '个人词典', '本地转写历史', '中英文界面'], ['Chinese voice input', 'Hotkey controls', 'Text refinement', 'Personal vocabulary', 'Local transcription history', 'Chinese and English UI'])},
+         'featureList': choose(['多语言语音输入', '快捷键启停', '智能整理', '个人词典', '本地转写历史', '中英文界面'], ['Multilingual voice input', 'Hotkey controls', 'Text refinement', 'Personal vocabulary', 'Local transcription history', 'Chinese and English UI'])},
         {'@type': 'FAQPage', '@id': canonical + '#faq', 'inLanguage': 'en' if en else 'zh-CN',
          'mainEntity': [{'@type': 'Question', 'name': choose(qzh, qen), 'acceptedAnswer': {'@type': 'Answer', 'text': choose(azh, aen)}} for qzh, qen, azh, aen in FAQ]},
     ]}
@@ -115,8 +115,8 @@ def page(language):
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{escape(title, quote=True)}">
 <meta name="twitter:description" content="{escape(description, quote=True)}"><meta name="twitter:image" content="{SOCIAL}">
 <link rel="icon" type="image/png" href="/assets/iSay.png"><link rel="apple-touch-icon" href="/assets/iSay.png">
-<link rel="stylesheet" href="/assets/site.css?v=20261103-slogan1">
-<script src="/assets/site.js?v=20261103-slogan1" defer></script><script src="/assets/downloads.js?v=20261103-slogan1" defer></script>
+<link rel="stylesheet" href="/assets/site.css?v=20261103-slogan2">
+<script src="/assets/site.js?v=20261103-slogan2" defer></script><script src="/assets/downloads.js?v=20261103-slogan2" defer></script>
 <script type="application/ld+json">{structured}</script>
 </head>
 <body>
@@ -125,10 +125,10 @@ def page(language):
 <nav aria-label="{choose('主导航', 'Main navigation')}">{t('a', '功能', 'Features', 'href="#features"')}{t('a', '如何使用', 'How it works', 'href="#start"')}{t('a', '常见问题', 'FAQ', 'href="#faq"')}<a class="language" href="{other}" lang="{'zh-CN' if en else 'en'}" aria-label="{choose('Switch to English', '切换到中文')}">{choose('EN', '中文')}</a></nav></header>
 <main id="main">
 <section class="hero" aria-labelledby="hero-title"><div class="hero-inner">
-<div class="hero-top entrance">{t('span', '开口，就成文。', 'YOUR VOICE. YOUR WORDS.', 'class="eyebrow"')}{t('span', f'Windows · 安装预览 {VERSION}', f'Windows · Installer preview {VERSION}', 'class="edition" data-release-edition')}</div>
+<div class="hero-top entrance">{t('span', '永久免费', 'FREE FOREVER', 'class="eyebrow"')}{t('span', f'Windows · 安装预览 {VERSION}', f'Windows · Installer preview {VERSION}', 'class="edition" data-release-edition')}</div>
 <div class="hero-layout"><div class="hero-copy entrance"><h1 class="wordmark" id="hero-title">iSay<span class="brand-dot">.</span></h1>
-{t('h2', '最好用的\\n中文语音输入法', 'Chinese voice input\\nat its best.', 'id="slogan-title"')}{t('p', '永久免费', 'Free forever', 'class="slogan-free"')}
-{t('p', '专为 Windows 打磨。按下右 Alt，自然说出来，让文字跟上你的思路。', 'Made for Windows. Press RightAlt and speak naturally. Let your words keep up with your thoughts.', 'class="hero-description"')}
+{t('h2', '最好用的\\n中文语音输入法', 'Chinese voice input\\nat its best.', 'id="slogan-title"')}
+{t('p', '按下右 Alt，让文字跟上你的思路。', 'Press RightAlt. Let words follow your thoughts.', 'class="hero-description"')}
 <div class="hero-action">{button('light')}{t('p', 'Windows 10 / 11 · x64 · 无需购买 iSay 订阅', 'Windows 10 / 11 · x64 · No iSay subscription', 'class="download-hint"')}</div>
 <a class="text-link on-dark" href="#features">{t('span', '看看它能做什么', 'See what you can do')}<span aria-hidden="true">↓</span></a></div>
 <figure class="hero-product entrance">{screenshot('voice-input', 'iSay Windows 中文语音输入真实界面，展示会议通知整理结果与右 Alt 快捷键', 'The real iSay interface with a refined meeting notice and RightAlt shortcut', True)}{t('figcaption', '真实界面，内容为演示数据 · 点击查看大图', 'Real interface with example content · Open full-size image')}</figure></div>
@@ -174,7 +174,7 @@ def main():
     (DIST / '_headers').write_text(headers, encoding='utf-8')
     (DIST / 'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: ' + BASE + '/sitemap.xml\n', encoding='utf-8')
     (DIST / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{BASE}{p}</loc><lastmod>{UPDATED}</lastmod></url>\n' for p in ['/', '/en/']) + '</urlset>\n', encoding='utf-8')
-    facts = {'name': 'iSay', 'description': '永久免费的 Windows 中文语音输入法', 'slogan': '最好用的中文语音输入法 · 永久免费', 'website': BASE + '/', 'englishWebsite': BASE + '/en/', 'repository': REPO, 'maintainer': 'Diorser', 'updated': UPDATED, 'version': VERSION, 'releaseChannel': 'installer-preview', 'platform': ['Windows 10 2004+ x64', 'Windows 11 x64'], 'price': {'app': 0, 'currency': 'CNY', 'policy': 'iSay 桌面产品永久免费；第三方服务额度、可用性及主动配置的 API 费用由服务商决定。'}, 'downloadUrl': DOWNLOAD, 'releaseUrl': RELEASE['releaseUrl'], 'sha256': RELEASE['sha256'], 'installerBytes': RELEASE['bytes'], 'features': ['中文语音输入', 'RightAlt 快捷键启停', '智能整理与原文对照', '个人词典及纠错', '本地历史搜索与复制', '悬浮录音条及托盘', '录音时静音', '中英文界面'], 'defaults': {'hotkey': 'RightAlt', 'startup': True, 'mutePlaybackWhileRecording': True, 'saveAudio': False, 'historyRetentionDays': 30}, 'limitations': ['不承诺全功能离线使用', '输入框兼容性因应用而异', 'Win10新机安装及真实麦克风识别待复验', '安装器未签Windows发布者签名', *(['自动更新未启用'] if not AUTO_UPDATES else []), '第三方原生组件单独再分发授权尚未取得，不属于iSay自有MIT许可范围'], 'automaticUpdatesEnabled': AUTO_UPDATES, 'screenshots': {'note': f'真实{VERSION}界面，内容为演示数据。', 'urls': [BASE + '/assets/screenshots/' + n + '.png' for n in ['voice-input', 'raw-input', 'history', 'dictionary', 'settings']]}}
+    facts = {'name': 'iSay', 'description': '永久免费的 Windows 中文语音输入法', 'slogan': '最好用的中文语音输入法 · 永久免费', 'website': BASE + '/', 'englishWebsite': BASE + '/en/', 'repository': REPO, 'maintainer': 'Diorser', 'updated': UPDATED, 'version': VERSION, 'releaseChannel': 'installer-preview', 'platform': ['Windows 10 2004+ x64', 'Windows 11 x64'], 'price': {'app': 0, 'currency': 'CNY', 'policy': 'iSay 桌面产品永久免费；第三方服务额度、可用性及主动配置的 API 费用由服务商决定。'}, 'downloadUrl': DOWNLOAD, 'releaseUrl': RELEASE['releaseUrl'], 'sha256': RELEASE['sha256'], 'installerBytes': RELEASE['bytes'], 'features': ['多语言语音输入', 'RightAlt 快捷键启停', '智能整理与原文对照', '个人词典及纠错', '本地历史搜索与复制', '悬浮录音条及托盘', '录音时静音', '中英文界面'], 'defaults': {'hotkey': 'RightAlt', 'startup': True, 'mutePlaybackWhileRecording': True, 'saveAudio': False, 'historyRetentionDays': 30}, 'limitations': ['不承诺全功能离线使用', '输入框兼容性因应用而异', 'Win10新机安装及真实麦克风识别待复验', '安装器未签Windows发布者签名', *(['自动更新未启用'] if not AUTO_UPDATES else []), '第三方原生组件单独再分发授权尚未取得，不属于iSay自有MIT许可范围'], 'automaticUpdatesEnabled': AUTO_UPDATES, 'screenshots': {'note': f'真实{VERSION}界面，内容为演示数据。', 'urls': [BASE + '/assets/screenshots/' + n + '.png' for n in ['voice-input', 'raw-input', 'history', 'dictionary', 'settings']]}}
     (DIST / 'product.json').write_text(json.dumps(facts, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     llms = f'''# iSay
 
@@ -190,7 +190,7 @@ def main():
 ## Product facts
 Maintainer: Diorser. Updated: {UPDATED}. Platform: Windows 10 2004+ and Windows 11, x64.
 The iSay desktop app is permanently free. Optional third-party APIs may charge separately; upstream availability and quotas are not guaranteed by iSay.
-Features: Chinese voice input, RightAlt controls, text refinement with original transcript comparison, personal vocabulary, local history, floating recording bar, tray, playback muting, Chinese and English UI.
+Features: multilingual voice input, RightAlt controls, text refinement with original transcript comparison, personal vocabulary, local history, floating recording bar, tray, playback muting, Chinese and English UI. Supported recognition languages depend on the selected speech service.
 History is local with 30-day default retention; audio saving is off by default. Online recognition/refinement may send required content to the selected service.
 Current release is an installer preview. Clean Win10 installation and real microphone acceptance are pending. The installer is unsigned. {UPDATE_EN}
 Compatibility depends on the input field. Full offline operation is not promised. Third-party native components are outside the project's MIT license; separate redistribution authorization has not been obtained.
@@ -198,7 +198,7 @@ Screenshots show the actual released UI populated with example content, not real
 Brand slogan: 最好用的中文语音输入法 · 永久免费 / Chinese voice input at its best · Free forever. This expresses the brand aspiration, not an independently verified ranking. No user-count, award or accuracy-rate claims are made.
 '''
     (DIST / 'llms.txt').write_text(llms, encoding='utf-8')
-    not_found = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>页面未找到 · iSay</title><link rel="stylesheet" href="/assets/site.css?v=20261103-slogan1"><main class="not-found"><img src="/assets/iSay.png" width="64" height="64" alt="iSay"><h1>这页走丢了。</h1><p>回到 iSay，继续把想法说出来。</p><a class="button light" href="/">返回官网 ↗</a></main></html>\n'
+    not_found = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>页面未找到 · iSay</title><link rel="stylesheet" href="/assets/site.css?v=20261103-slogan2"><main class="not-found"><img src="/assets/iSay.png" width="64" height="64" alt="iSay"><h1>这页走丢了。</h1><p>回到 iSay，继续把想法说出来。</p><a class="button light" href="/">返回官网 ↗</a></main></html>\n'
     (DIST / '404.html').write_text(not_found, encoding='utf-8')
     print('已生成静态中英文产品页、FAQ结构化数据、站点地图、产品资料、llms.txt及JSON-LD CSP哈希。')
 

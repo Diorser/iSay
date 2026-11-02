@@ -4,13 +4,16 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+import argparse
 import hashlib
 import json
 
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / 'website/dist'
 BASE = json.loads((DIST / 'product.json').read_text(encoding='utf-8'))['website'].rstrip('/')
-REPORT = ROOT / 'test/官网验收/20261103-产品化与SEO'
+parser = argparse.ArgumentParser(description='核对线上官网资源，并保留独立验收证据。')
+parser.add_argument('--report-directory', type=Path, default=ROOT / 'test/官网验收' / datetime.now().strftime('%Y%m%d-%H%M%S'))
+REPORT = parser.parse_args().report_directory.resolve()
 HEADERS = {'User-Agent': 'iSay-site-verifier/1.0', 'Cache-Control': 'no-cache'}
 
 
@@ -34,6 +37,12 @@ def verify(file):
         assert "script-src 'self' 'sha256-" in headers.get('Content-Security-Policy', ''), '线上缺少 JSON-LD CSP 哈希'
     if relative == 'downloads/windows.json':
         assert 'no-store' in headers.get('Cache-Control', ''), '下载元数据不得缓存'
+    if relative.startswith('updates/'):
+        assert 'no-store' in headers.get('Cache-Control', ''), '更新清单不得缓存'
+        assert 'noindex' in headers.get('X-Robots-Tag', ''), '更新清单应排除索引'
+    if relative.startswith('objects/'):
+        assert 'immutable' in headers.get('Cache-Control', ''), '内容哈希对象应长期缓存'
+        assert 'noindex' in headers.get('X-Robots-Tag', ''), '更新对象应排除索引'
     return {'path': path, 'status': status, 'sha256': digest, 'bytes': len(content), 'matchesLocal': True}
 
 
