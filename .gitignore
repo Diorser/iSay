@@ -44,3 +44,6 @@ test/**/.runtime/
 *.sqlite3
 *.bak
 *.tmp
+
+# IndexNow 公开验证文件只随官网部署，本机状态保存在 artifacts 内。
+/website/dist/indexnow-*.txt

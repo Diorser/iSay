@@ -1,77 +1,109 @@
 [English](./README.en.md)
 
-# <img src="./src/iSay.Desktop/Assets/iSay.png" width="32" alt="" /> iSay
+# <img src="./src/iSay.Desktop/Assets/iSay.png" width="36" alt="iSay 图标" /> iSay · 永久免费的 Windows 中文语音输入法
 
-让想法，顺着声音变成文字。
+**你的下一句话，不必再一字一字敲。**
 
-iSay 是一款面向 Windows 的语音输入工具：按下快捷键开始说话，在支持的输入框中实时呈现文字，再按一次完成输入。支持智能整理、个人词典、悬浮录音条和中英文界面。
+iSay 致力于成为你最好用的 Windows 中文语音输入法。按下右 Alt，把想说的话自然说出来，让文字跟上思路；再用智能整理、个人词典和本地历史，把表达变成自己的样子。
 
-[官网](https://isay-voice.pages.dev/) · [查看源码](https://github.com/Diorser/iSay) · [反馈问题](https://github.com/Diorser/iSay/issues) · [使用与构建](./docs/公开/使用与构建.md) · [完整安装包说明](./docs/公开/完整安装包发布说明.md) · [隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)
+**永久免费 · 专为 Windows · 中文表达优先**
+
+[**免费下载 Windows 版 →**](https://github.com/Diorser/iSay/releases/download/v0.10.5-installer-preview/iSay-0.10.5-win-x64-full.exe) · [访问官网](https://isay-voice.pages.dev/) · [三步开始](#三步开始把说话变成输入) · [反馈与建议](https://github.com/Diorser/iSay/issues)
+
+Windows 10 / 11 · x64 · 当前安装预览版 0.10.5 · 完整安装包 192.18 MiB
+
+![iSay Windows 中文语音输入界面：录音控制、识别原文与整理结果](./website/dist/assets/screenshots/voice-input.png)
+
+## 把注意力留给想法
+
+写消息、回邮件、记灵感、起草长文。你负责把意思说清楚，iSay 帮你把声音变成可以继续编辑的文字。
+
+| 你想做的事 | iSay 的方式 |
+|---|---|
+| 想到就说，少一点打字 | 右 Alt 一键开始、再次按下结束；在支持的输入框中实时呈现文字，也可结束后输出或复制结果。 |
+| 口语先说，文字再理顺 | 选择自然整理或仅基础转写，调整标点、中英间距和语气词处理，保留识别原文供对照；自定义兼容接口还可使用清晰分段。 |
+| 人名、术语和常用表达有处安放 | 管理个人词典与纠错，按需开启词汇与学习选项，积累自己的表达偏好。 |
+| 不想为了录音来回切窗口 | 悬浮录音条显示状态，托盘常驻，快捷键随时启停。 |
+| 刚才说过的话，还想接着用 | 在本机查看和搜索转写历史，再次复制；可设置保存与保留时间。 |
+| 让工具适应自己的习惯 | 自定义快捷键、切换按下启停或按住说话、选择麦克风、录音时静音，以及中英文界面。 |
+
+支持情况因应用输入框而异；某些输入框需要普通文本兼容模式，或通过复制结果使用。
+
+## 三步开始，把说话变成输入
+
+1. **下载安装。** [下载完整 Windows 安装包](https://github.com/Diorser/iSay/releases/download/v0.10.5-installer-preview/iSay-0.10.5-win-x64-full.exe)，按向导完成安装。所需的 .NET、VC++ 安装器已经随包提供，无需分别寻找下载。
+2. **选好麦克风。** 打开 iSay，确认 Windows 已允许麦克风访问，选择要使用的设备。
+3. **按右 Alt，开始说话。** 把光标放进支持的输入框，按一次右 Alt 开始，再按一次结束。也可以先在 iSay 中查看结果，再复制使用。
+
+首次配置默认开启登录自启和录音时静音。快捷键、输出方式和这些偏好都可以在设置里修改；已有保存的选择会被保留。
+
+## 好用，来自每天用得到的细节
+
+### 先说出来，再整理成文
+
+不必一边组织思路，一边纠结标点。先完整表达，再选择适合自己的整理风格；原文与整理结果可以对照查看，也能重新整理和复制。
+
+![iSay 识别原文界面：与整理结果对照的会议通知演示](./website/dist/assets/screenshots/raw-input.png)
+
+### 你的词汇，你来管理
+
+项目名称、行业术语、经常提起的人名，都可以放进个人词典。需要时再开启相关词汇与学习功能，保留自己的使用选择。
+
+![iSay 个人词典界面：常用词、个人词汇和纠错管理](./website/dist/assets/screenshots/dictionary.png)
+
+### 顺手的设置，安静地陪你工作
+
+选好麦克风、设定常用快捷键，录音时按需静音系统播放。主窗口之外还有悬浮条和托盘，让语音输入融入日常桌面。
+
+![iSay 设置界面：麦克风、录音快捷键和录音时静音](./website/dist/assets/screenshots/settings.png)
+
+界面截图使用演示内容，不含真实用户资料。
+
+## 永久免费，把门槛降到一次下载
+
+iSay 桌面产品永久免费。我们希望语音输入成为每个人都能顺手使用的日常工具。
+
+免费承诺适用于 iSay 产品本身。如果你主动配置第三方语音或 AI 接口，服务商可能另行计费；第三方服务的可用性、额度与条款由其提供方决定。这不代表上游服务永久、不限量或离线可用。
+
+## 常见问题
+
+### 支持哪些 Windows？
+
+当前提供 Windows x64 版本，安装器要求 Windows 10 2004（系统版本 19041）及以上，也面向 Windows 11。macOS、Linux 和 Windows ARM64 暂未提供安装版。
+
+### 可以在所有软件里直接输入吗？
+
+在支持的输入框中可以使用直接输入。不同应用对输入组件的支持不同，暂不承诺全部软件兼容；遇到问题可尝试普通文本兼容模式，或在 iSay 中复制结果。
+
+### 需要联网吗？
+
+当前内置识别与整理能力依赖第三方组件和服务，不承诺全功能离线使用。使用自定义接口时，网络、识别语言、延迟与费用取决于对应服务。中英文界面不等于识别服务支持相同的语种。
+
+### 语音和历史记录会保存在哪里？
+
+转写历史默认保存在本机并保留 30 天，录音文件默认不保存，可以在设置中调整。联网识别或整理会由相应服务处理所需内容；“历史在本机”不代表语音始终不出本机。详见[隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)。
+
+### 当前版本适合直接全面使用吗？
+
+当前 0.10.5 仍为完整安装预览版。Windows 10 新机安装和真实麦克风识别尚未完成复验，建议先用自己的麦克风与常用软件试用。安装器尚无 Windows 发布者签名，客户端自动更新源尚未启用，暂通过官网或 [GitHub Release](https://github.com/Diorser/iSay/releases/tag/v0.10.5-installer-preview) 手动下载新版本。完整状态与校验文件见[发行说明](./docs/公开/完整安装包发布说明.md)。
+
+### 录音后没有文字，或者遇到兼容问题，怎么办？
+
+先在 iSay 界面使用录音按钮，确认麦克风选择、Windows 麦克风权限和网络；再区分快捷键、识别服务与目标输入框的问题。仍无法解决时，请在 [Issues](https://github.com/Diorser/iSay/issues) 写明 Windows 版本、iSay 版本、目标应用与复现步骤。提交诊断前请移除音频、转写正文、账号、密钥、词库和私人路径。
+
+## 一起把中文语音输入做得更好
+
+觉得 iSay 顺手，欢迎给项目点一个 **Star**，也欢迎分享给同样需要少打字、多表达的朋友。发现问题、想要新功能，都可以[告诉我们](https://github.com/Diorser/iSay/issues)。
+
+[**免费下载 Windows 版 →**](https://github.com/Diorser/iSay/releases/download/v0.10.5-installer-preview/iSay-0.10.5-win-x64-full.exe) · [查看官网](https://isay-voice.pages.dev/) · [发行说明与 SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.5-installer-preview)
+
+<details>
+<summary>开发者：构建、源码与检查</summary>
+
+自有源码开放，欢迎阅读、改进和贡献。构建环境、双架构输入组件、兼容接口和回归命令集中在[使用与构建](./docs/公开/使用与构建.md)；发行流程见[完整安装包发布说明](./docs/公开/完整安装包发布说明.md)。公开 Git 仓库不包含第三方原生二进制，克隆源码并不等于具备完整服务环境。
 
 [![源码构建](https://github.com/Diorser/iSay/actions/workflows/%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA.yml/badge.svg)](https://github.com/Diorser/iSay/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 
-> **当前提供 0.10.1 完整安装预览版和自有源码。** 完整包包含现有识别、整理、学习、词典组件，以及按需安装的 .NET Desktop / VC++ 环境。第三方原生组件不属于本项目 MIT 范围，单独再分发授权尚未取得；详情见[完整安装包说明](./docs/公开/完整安装包发布说明.md)。Windows 10 新机安装与真实麦克风识别仍待验收，请先试用预览版。
+</details>
 
-## 下载
-
-[下载 Windows x64 完整安装包 · 192.17 MiB](https://github.com/Diorser/iSay/releases/download/v0.10.1-installer-preview/iSay-0.10.1-win-x64-full.exe) · [发行说明与 SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.1-installer-preview)
-
-也可从[官网](https://isay-voice.pages.dev/)进入下载。无需预先另找 .NET 或 VC++ 安装器；安装向导会检测并按需安装随包环境。当前安装器未签 Windows 发布者签名，客户端自动更新服务尚未启用。GitHub 的 Source code 压缩包是源码，不是安装器。
-
-## 功能
-
-| 功能 | 说明 |
-|---|---|
-| 语音输入 | 麦克风选择、快捷键启停、实时识别状态和悬浮录音条。完整安装包已含现有第三方组件；源码构建需另备组件，远端服务仍需可用。 |
-| 输入框集成 | 自有 Windows TSF 组件提供组合文本输入；可切换普通文本兼容模式。不同应用的输入框支持情况需要分别验证。 |
-| 智能整理 | 基础文本处理、标点与间距偏好、内置整理适配器，以及可配置的兼容 AI 接口。 |
-| 个人词典 | 词条管理、纠错与可选学习；部分能力依赖第三方原生组件。额外联网学习默认关闭。 |
-| 本机记录 | 转写历史与可选录音保存，支持保留期限配置；自定义服务密钥使用当前 Windows 用户的 DPAPI 保护。 |
-| 日常使用 | 托盘、登录自启、录音时静音；设置最后一页提供“关于”、语言选择与更新入口。 |
-| 安装与更新 | Windows 安装脚本、独立更新器、RSA 签名清单验证、断点续传、文件事务回滚与中断恢复。正式更新源与客户端公钥尚未配置。 |
-| 中英文 | 简体中文、英文界面。界面语言不代表语音服务支持相同的识别语言。 |
-
-## 平台与默认设置
-
-当前主线使用 **C# / WPF / .NET 10**，目标为 **Windows x64**；安装器门槛为 Windows 10 版本 2004（19041）及以上。TSF 组件同时构建 x64 与 x86，以适配两种位数的输入宿主。macOS、Linux 和 Windows ARM64 暂不在本次发行范围。
-
-新配置默认使用 **右 Alt（RightAlt）**，按一次开始、再按一次结束；默认勾选登录自启和录音时静音。已有明确配置不会被这些新默认值覆盖。转写历史默认保留 30 天，录音文件默认不保存。
-
-WPF 可以采用依赖系统运行时的发布方式。运行桌面程序需要 **.NET 10 Windows Desktop Runtime x64**；原生组件还可能需要 **Visual C++ v14 x64 / x86**。完整离线安装方案会携带微软官方运行时安装器，检测后按需安装，因此包体积不能只按自有程序计算；x86 运行库用于对应位数的原生组件，与 x64 运行库用途不同。
-
-## 从源码构建
-
-准备 Windows、.NET 10 SDK；编译 TSF 组件另需 CMake 3.24+、Visual Studio 2022 C++ 工具链与 Windows SDK。
-
-```powershell
-git clone https://github.com/Diorser/iSay.git
-cd iSay
-dotnet build src/iSay.Desktop/iSay.Desktop.csproj -c Release
-dotnet build src/iSay.Updater/iSay.Updater.csproj -c Release
-dotnet build src/iSay.ReleaseTool/iSay.ReleaseTool.csproj -c Release
-```
-
-以上命令构建托管源码，不会安装输入组件，也不会下载第三方识别引擎。TSF 双架构构建、兼容接口配置和发行前提见[使用与构建](./docs/公开/使用与构建.md)。
-
-## 项目结构
-
-| 目录 | 用途 |
-|---|---|
-| `src/iSay.Desktop` | WPF 界面、录音、输入交付、设置与托盘。 |
-| `src/iSay.Voice` | 语音服务、整理、词典、个性化与本机数据适配。 |
-| `src/iSay.TextService` | 自有 C++ TSF 输入组件，当前组件版本 0.9.7。 |
-| `src/iSay.TextService.Setup` | 输入组件注册与维护程序。 |
-| `src/iSay.Updates`、`src/iSay.Updater` | 更新校验、下载和独立文件事务更新。 |
-| `src/iSay.ReleaseTool`、`scripts/发布` | 发行清单、打包和 Cloudflare 更新服务模板。 |
-| `test` | 可独立运行的回归检查源码；不含个人测试数据。 |
-| `website` | 静态官网源码。 |
-
-## 当前状态
-
-本次公开的是持续完善中的源码预览。独立源码编译、更新安全及文件事务等回归已完成；隔离的 0.10.0 实例已完成 100 次启停、30 分钟固定音频识别和 8 小时空闲测试，空闲 CPU 与内存符合本次预算。该测试不包含真实麦克风、输入宿主中的 TSF、智能整理或学习，**Windows 10 虚拟机的新机安装和真实麦克风识别仍待验收**，暂不作完整场景稳定性的最终承诺。文件事务回滚不包含“新版本启动后自动健康检查并回退”。
-
-请在 [Issues](https://github.com/Diorser/iSay/issues) 中描述 Windows 版本、iSay 版本、输入应用和复现步骤。提交日志前，请移除音频、转写正文、词库、账号、密钥和个人路径。
-
-## 许可与作者
-
-自有源码采用 [MIT License](./LICENSE)，作者 [Diorser](https://github.com/Diorser)。第三方软件、运行时、字体、商标和服务遵循各自许可与条款，MIT 不授予这些组件的再分发权，也不代表第三方授权或背书。详情见[隐私与第三方依赖](./docs/公开/隐私与第三方依赖.md)与[第三方依赖声明](./scripts/发布/第三方依赖声明.txt)。
+自有源码采用 [MIT License](./LICENSE)，作者 [Diorser](https://github.com/Diorser)。第三方软件、原生组件与服务保留各自权利和适用条款，不属于 iSay 的 MIT 授权范围，也不代表得到其授权或背书。相关归属、单独授权尚未取得的范围及发行现状，见[第三方依赖声明](./scripts/发布/第三方依赖声明.txt)、[隐私说明](./docs/公开/隐私与第三方依赖.md)和[完整安装包说明](./docs/公开/完整安装包发布说明.md)。

@@ -1,9 +1,9 @@
-/* 只有公开安装器的完整元数据通过校验后才提供下载，不链接草稿或源码压缩包。 */
+/* 核验元数据后同步下载信息；异常时保留生成页面中已公开的静态入口。 */
 (() => {
   'use strict';
   const repository = 'Diorser/iSay';
   async function load() {
-    const response = await fetch(new URL('./downloads/windows.json', document.baseURI), {cache: 'no-store'});
+    const response = await fetch(new URL('/downloads/windows.json', document.baseURI), {cache: 'no-store'});
     if (!response.ok) return;
     const release = await response.json();
     if (release.schema !== 1 || release.status !== 'available' || release.roundTripHashVerified !== true || release.architecture !== 'win-x64' ||
@@ -22,15 +22,20 @@
     const paragraph = document.querySelector('.source-notice p');
     // 先确认所有目标存在，避免页面结构变化时只切换部分下载文案。
     if (!button || !label || !heading || !paragraph) return;
-    label.dataset.zh = '下载 Windows 安装包';
+    label.dataset.zh = '免费下载 Windows 版';
     label.dataset.en = 'Download for Windows';
     button.href = address.href;
     button.setAttribute('aria-label', `iSay ${release.version} · ${(release.bytes / 1048576).toFixed(2)} MiB`);
     button.title = `SHA256: ${release.sha256}`;
     heading.dataset.zh = 'Windows 完整安装预览版';
     heading.dataset.en = 'Complete Windows installer preview';
-    paragraph.dataset.zh = `版本 ${release.version}，${(release.bytes / 1048576).toFixed(2)} MiB。完整安装包包含本次发行的组件及依赖安装器；仍为预览版，请先在隔离环境验证。`;
-    paragraph.dataset.en = `Version ${release.version}, ${(release.bytes / 1048576).toFixed(2)} MiB. The complete installer includes this release's components and prerequisites. This is a preview; test it in an isolated environment first.`;
+    paragraph.dataset.zh = `版本 ${release.version}，${(release.bytes / 1048576).toFixed(2)} MiB。完整安装包已包含现有功能组件和必需环境，跟随向导即可安装。当前为安装预览版，建议先在自己的麦克风与常用软件中试用。`;
+    paragraph.dataset.en = `Version ${release.version}, ${(release.bytes / 1048576).toFixed(2)} MiB. Includes current components and prerequisites. Follow the setup wizard, then try this preview with your microphone and everyday apps.`;
+    document.querySelectorAll('[data-download]').forEach(link => {
+      link.href = address.href;
+      link.setAttribute('aria-label', `iSay ${release.version} · ${(release.bytes / 1048576).toFixed(2)} MiB`);
+      link.title = `SHA256: ${release.sha256}`;
+    });
     const edition = document.querySelector('[data-release-edition]');
     const version = document.querySelector('[data-release-version]');
     if (edition) {
@@ -44,5 +49,5 @@
     window.iSayReleaseVersion = release.version;
     window.dispatchEvent(new Event('isay:release-ready'));
   }
-  load().catch(() => { /* 元数据不可用时保留源码入口，不提供无法验证的下载。 */ });
+  load().catch(() => { /* 元数据不可用时保留生成页面中已公开的静态下载入口。 */ });
 })();

@@ -15,7 +15,11 @@ $scriptFiles = @('scripts/构建组合输入组件.ps1', 'scripts/构建组合�
     'scripts/发布/发布Windows版本.ps1', 'scripts/发布/发布完整安装包.ps1', 'scripts/发布/下载GitHub发行资产.ps1', 'scripts/发布/Cloudflare/worker.mjs',
     'scripts/发布/Cloudflare/wrangler.jsonc', 'scripts/发布/Cloudflare/使用说明.md',
     'test/发行打包回归/Worker回归.mjs', 'test/开源发布检查/检查公开源码.ps1', 'test/开源发布检查/验证独立编译.ps1',
-    'test/安装包下载发布回归/安装包下载发布回归.ps1', 'test/官网下载入口回归/官网入口回归.mjs')
+    'test/安装包下载发布回归/安装包下载发布回归.ps1', 'test/官网下载入口回归/官网入口回归.mjs',
+    'test/官网SEO回归/官网SEO回归.py', 'test/产品宣传截图/Program.cs',
+    'test/产品宣传截图/产品宣传截图.csproj', 'test/产品宣传截图/截图生成说明.md',
+    'scripts/发布/提交搜索收录.py', 'website/生成官网.py', 'website/官网维护说明.md', 'website/搜索与AI发现说明.md',
+    'README.md', 'README.en.md')
 $sourceExtensions = @('.cs','.cpp','.h','.rc','.def','.csproj','.xaml','.manifest','.md','.json','.jsonc',
     '.ps1','.py','.mjs','.js','.iss','.isl','.txt','.toml','.svg','.png','.ico')
 $publicFiles = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
@@ -42,6 +46,13 @@ foreach ($file in $scriptFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $repository $file) -PathType Leaf)) { throw ('公开候选缺少必要文件：' + $file) }
     [void]$publicFiles.Add($file)
 }
+# 静态官网是明确的公开范围；IndexNow 所有权文件只随站点部署，不进入源码。
+foreach ($file in @(Get-RelativeSourceFiles 'website/dist')) {
+    if ($file -notmatch '^website/dist/indexnow-[a-f0-9]+\.txt$') { [void]$publicFiles.Add($file) }
+}
+Get-ChildItem -LiteralPath (Join-Path $repository 'website/dist') -File -Recurse |
+    Where-Object { $_.Extension -in @('.html','.css','.xml') -or $_.Name -eq '_headers' } |
+    ForEach-Object { [void]$publicFiles.Add([IO.Path]::GetRelativePath($repository, $_.FullName).Replace('\','/')) }
 $patterns = [ordered]@{
     '疑似凭据或私钥格式' = '(?i)(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{24,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)'
     '个人绝对路径' = '(?i)(?:[A-Z]:[\\/]+Users[\\/]+(?!Public(?:[\\/]|$))[^\\/\s"'']+|/home/(?!runner/)[A-Za-z0-9._-]+(?:/|\b))'
@@ -51,6 +62,7 @@ $patterns = [ordered]@{
 }
 $riskFiles = [Collections.Generic.List[object]]::new()
 $scanFiles = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+foreach ($file in $publicFiles) { [void]$scanFiles.Add($file) }
 foreach ($directory in @('src','scripts','docs')) {
     foreach ($file in @(Get-RelativeSourceFiles $directory)) { [void]$scanFiles.Add($file) }
 }

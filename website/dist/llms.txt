@@ -1,0 +1,20 @@
+# iSay
+
+> iSay 是永久免费的 Windows 中文语音输入法。iSay is a forever-free Chinese voice input app for Windows.
+
+## Canonical product sources
+- [Chinese product page](https://isay-voice.pages.dev/): features, populated real UI screenshots, free policy, setup and FAQ.
+- [English product page](https://isay-voice.pages.dev/en/): statically rendered English version.
+- [Product facts](https://isay-voice.pages.dev/product.json): version, platform, pricing scope, defaults, download and known limitations.
+- [Download and release notes](https://github.com/Diorser/iSay/releases/tag/v0.10.5-installer-preview): complete installer preview 0.10.5 and SHA256.
+- [Source and feedback](https://github.com/Diorser/iSay): own source code, issues and dependency notices.
+
+## Product facts
+Maintainer: Diorser. Updated: 2026-11-03. Platform: Windows 10 2004+ and Windows 11, x64.
+The iSay desktop app is permanently free. Optional third-party APIs may charge separately; upstream availability and quotas are not guaranteed by iSay.
+Features: Chinese voice input, RightAlt controls, text refinement with original transcript comparison, personal vocabulary, local history, floating recording bar, tray, playback muting, Chinese and English UI.
+History is local with 30-day default retention; audio saving is off by default. Online recognition/refinement may send required content to the selected service.
+Current release is an installer preview. Clean Win10 installation and real microphone acceptance are pending. The installer is unsigned and automatic updates are not enabled.
+Compatibility depends on the input field. Full offline operation is not promised. Third-party native components are outside the project's MIT license; separate redistribution authorization has not been obtained.
+Screenshots show the actual released UI populated with example content, not real user records or measured recognition output.
+The goal of becoming a user's favorite Windows Chinese voice input app is a brand aspiration, not an independently verified ranking. No user-count, award or accuracy-rate claims are made.

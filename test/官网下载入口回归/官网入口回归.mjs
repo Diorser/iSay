@@ -50,7 +50,7 @@ async function run(release, options = {}) {
   const events = [];
   const fetches = [];
   const document = {
-    baseURI: 'https://isay-voice.pages.dev/', documentElement: element(),
+    baseURI: options.baseURI ?? 'https://isay-voice.pages.dev/', documentElement: element(),
     querySelector(selector) { return options.missing === selector ? null : nodes.get(selector) ?? null; },
     querySelectorAll(selector) { return selector === '[data-zh]' ? [label, heading, paragraph] : []; },
     getElementById(id) { return ids.get(id) ?? null; },
@@ -138,10 +138,10 @@ for (const missing of ['.hero-action a.button', 'label', '.source-notice h3', '.
 }
 
 for (const language of ['zh', 'en']) {
-  const result = await run(valid, {language});
+  const result = await run(valid, {language, baseURI: `https://isay-voice.pages.dev/${language === 'en' ? 'en/' : ''}`});
   assert.equal(result.button.href, valid.url, '只指向完整 EXE 的公开发行资产地址');
   assert.deepEqual(result.events, ['isay:release-ready'], '元数据验证后只发出一次就绪事件');
-  assert.equal(result.label.dataset.zh, '下载 Windows 安装包');
+  assert.equal(result.label.dataset.zh, '免费下载 Windows 版');
   assert.equal(result.label.dataset.en, 'Download for Windows');
   assert.equal(result.label.textContent, result.label.dataset[language], '真实语言处理器应用下载文案');
   assert.equal(result.heading.textContent, result.heading.dataset[language]);

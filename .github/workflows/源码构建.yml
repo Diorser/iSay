@@ -20,6 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: 构建公开解决方案
         run: dotnet build iSay公开.slnx -c Release --nologo
       - name: 运行托管回归
@@ -33,6 +36,8 @@ jobs:
         run: node test/发行打包回归/Worker回归.mjs
       - name: 检查官网下载入口
         run: node test/官网下载入口回归/官网入口回归.mjs
+      - name: 检查官网SEO与产品资料
+        run: python -X utf8 test/官网SEO回归/官网SEO回归.py
       - name: 检查独立安装包发布
         shell: pwsh
         run: ./test/安装包下载发布回归/安装包下载发布回归.ps1
