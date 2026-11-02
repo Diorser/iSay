@@ -48,12 +48,14 @@ var manifest = new ReleaseManifest
 };
 File.WriteAllBytes(Path.Combine(output, "manifest.unsigned.json"), ManifestCodec.CanonicalPayload(manifest));
 var keyPath = Environment.GetEnvironmentVariable("ISAY_RELEASE_SIGNING_KEY_PATH");
+var keyPem = Environment.GetEnvironmentVariable("ISAY_RELEASE_SIGNING_KEY_PEM");
 var signed = false;
-if (!string.IsNullOrWhiteSpace(keyPath))
+if (!string.IsNullOrWhiteSpace(keyPem) || !string.IsNullOrWhiteSpace(keyPath))
 {
     if (urls.Count == 0 || string.IsNullOrWhiteSpace(request.KeyId)) throw new InvalidDataException("签名前必须提供真实下载地址和 keyId。");
     using var key = RSA.Create();
-    key.ImportFromPem(File.ReadAllText(keyPath));
+    // 本机发布器优先从进程环境传入临时解密内容，私钥不落明文文件。
+    key.ImportFromPem(!string.IsNullOrWhiteSpace(keyPem) ? keyPem : File.ReadAllText(keyPath!));
     var envelope = ManifestCodec.Sign(manifest, key, request.KeyId);
     var configuration = new UpdateConfiguration { Channel = request.Channel, Architecture = "win-x64", PublicKeys = new() { [request.KeyId] = key.ExportSubjectPublicKeyInfoPem() } };
     ManifestCodec.Verify(envelope, configuration);

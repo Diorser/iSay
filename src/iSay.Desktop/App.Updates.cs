@@ -44,11 +44,20 @@ public partial class App
         {
             // 延迟与抖动减少启动竞争；检查器不启动常驻辅助进程。
             await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(30, 61)), lifetime.Token);
+            var nextCheck = DateTimeOffset.MinValue;
+            var wasEnabled = savedSettings.AutoCheckUpdates;
             while (!lifetime.IsCancellationRequested)
             {
-                if (savedSettings.AutoCheckUpdates && !vm.IsRecording && !vm.IsBusy)
+                var enabled = savedSettings.AutoCheckUpdates;
+                if (enabled && !wasEnabled) nextCheck = DateTimeOffset.MinValue;
+                wasEnabled = enabled;
+                if (enabled && DateTimeOffset.UtcNow >= nextCheck && !vm.IsRecording && !vm.IsBusy && !vm.IsFormatting && !stopping && formattingTasks.Count == 0)
+                {
                     await CheckForUpdatesAsync(false);
-                await Task.Delay(TimeSpan.FromHours(12) + TimeSpan.FromMinutes(Random.Shared.Next(0, 31)), lifetime.Token);
+                    nextCheck = DateTimeOffset.UtcNow + TimeSpan.FromHours(12) + TimeSpan.FromMinutes(Random.Shared.Next(0, 31));
+                }
+                // 忙碌时仅推迟一分钟；不能因启动时正在录音而错过整整十二小时。
+                await Task.Delay(TimeSpan.FromMinutes(1), lifetime.Token);
             }
         }
         catch (OperationCanceledException) { }

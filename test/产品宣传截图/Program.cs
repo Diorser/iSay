@@ -20,11 +20,12 @@ internal static class Program
     private static Border surface = null!;
 
     [STAThread]
-    private static int Main()
+    private static int Main(string[] args)
     {
         try
         {
             Directory.CreateDirectory(Output);
+            if (Array.IndexOf(args, "--social-only") >= 0) { SocialPreview(); return 0; }
             var app = new SafePreviewApp();
             var settings = new VoiceSettings
             {
@@ -124,8 +125,9 @@ internal static class Program
             var logo = new BitmapImage(new Uri(Path.Combine(Root, "src/iSay.Desktop/Assets/iSay.png")));
             draw.DrawImage(logo, new Rect(88, 62, 62, 62));
             Text(draw, "iSay", 177, 50, 68, paper, "Segoe UI", FontWeights.SemiBold);
-            Text(draw, "开口，就成文。", 82, 208, 91, paper, "Microsoft YaHei UI", FontWeights.Medium);
-            Text(draw, "Windows 中文语音输入法", 88, 369, 29, mint, "Microsoft YaHei UI", FontWeights.Normal);
+            Text(draw, "最好用的", 82, 190, 76, paper, "Microsoft YaHei UI", FontWeights.Medium);
+            Text(draw, "中文语音输入法", 82, 288, 76, paper, "Microsoft YaHei UI", FontWeights.Medium);
+            Text(draw, "专为 Windows 打磨", 88, 405, 25, mint, "Microsoft YaHei UI", FontWeights.Normal);
             draw.DrawRoundedRectangle(new SolidColorBrush(mint), null, new Rect(88, 469, 160, 51), 5, 5);
             Text(draw, "永久免费", 113, 475, 25, background, "Microsoft YaHei UI", FontWeights.SemiBold);
             Text(draw, "isay-voice.pages.dev", 720, 490, 23, mint, "Segoe UI", FontWeights.Normal);

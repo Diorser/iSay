@@ -7,6 +7,7 @@ param(
     [string[]]$DownloadBaseUrls = @(),
     [long]$Sequence = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds(),
     [string]$KeyId = '',
+    [ValidateSet('stable','preview')][string]$Channel = 'stable',
     [string]$NotesZh = 'Windows 安装、更新与中英文界面。',
     [string]$NotesEn = 'Windows installer, updates and bilingual interface.',
     [switch]$LayoutOnly
@@ -54,7 +55,7 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'artifacts/组合输入安装器/
 $totalBytes = (@(Get-ReleasePlainFiles $layout) | Measure-Object Length -Sum).Sum
 [ordered]@{ application='iSay'; version=$version; compositionVersion=$compositionVersion; architecture='win-x64'; minimumDesktopRuntime=$MinimumRuntimeVersion; expandedBytes=$totalBytes; containsPersonalData=$false; publicRedistributionApproved=$false } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $layout 'product.json') -Encoding utf8
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '第三方依赖声明.txt') -Destination $layout
-$releaseRequest = [ordered]@{ LayoutDirectory=$layout; OutputDirectory=$updates; Version=$version; Sequence=$Sequence; KeyId=$KeyId; DownloadBaseUrls=@($DownloadBaseUrls); NotesZh=$NotesZh; NotesEn=$NotesEn }
+$releaseRequest = [ordered]@{ LayoutDirectory=$layout; OutputDirectory=$updates; Version=$version; Channel=$Channel; Sequence=$Sequence; KeyId=$KeyId; DownloadBaseUrls=@($DownloadBaseUrls); NotesZh=$NotesZh; NotesEn=$NotesEn }
 $requestPath = Join-Path $output '发行请求.json'
 $releaseRequest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $requestPath -Encoding utf8
 & dotnet run --project (Join-Path $projectRoot 'src/iSay.ReleaseTool/iSay.ReleaseTool.csproj') -c Release -- $requestPath

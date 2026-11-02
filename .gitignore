@@ -47,3 +47,6 @@ test/**/.runtime/
 
 # IndexNow 公开验证文件只随官网部署，本机状态保存在 artifacts 内。
 /website/dist/indexnow-*.txt
+
+# 已签名应用包随 Pages 发布，Git 仓库只保留签名清单与公开源码。
+/website/dist/objects/

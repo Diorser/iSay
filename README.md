@@ -1,10 +1,10 @@
 [English](./README.en.md)
 
-# <img src="./src/iSay.Desktop/Assets/iSay.png" width="36" alt="iSay 图标" /> iSay · 永久免费的 Windows 中文语音输入法
+# <img src="./src/iSay.Desktop/Assets/iSay.png" width="36" alt="iSay 图标" /> iSay · 最好用的中文语音输入法 · 永久免费
 
 **你的下一句话，不必再一字一字敲。**
 
-iSay 致力于成为你最好用的 Windows 中文语音输入法。按下右 Alt，把想说的话自然说出来，让文字跟上思路；再用智能整理、个人词典和本地历史，把表达变成自己的样子。
+iSay 是一款专为 Windows 打造的中文语音输入法。按下右 Alt，把想说的话自然说出来，让文字跟上思路；再用智能整理、个人词典和本地历史，把表达变成自己的样子。
 
 **永久免费 · 专为 Windows · 中文表达优先**
 
@@ -91,7 +91,7 @@ iSay 桌面产品永久免费。我们希望语音输入成为每个人都能顺
 
 先在 iSay 界面使用录音按钮，确认麦克风选择、Windows 麦克风权限和网络；再区分快捷键、识别服务与目标输入框的问题。仍无法解决时，请在 [Issues](https://github.com/Diorser/iSay/issues) 写明 Windows 版本、iSay 版本、目标应用与复现步骤。提交诊断前请移除音频、转写正文、账号、密钥、词库和私人路径。
 
-## 一起把中文语音输入做得更好
+## 最好用的中文语音输入法 · 永久免费
 
 觉得 iSay 顺手，欢迎给项目点一个 **Star**，也欢迎分享给同样需要少打字、多表达的朋友。发现问题、想要新功能，都可以[告诉我们](https://github.com/Diorser/iSay/issues)。
 

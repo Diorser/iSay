@@ -7,7 +7,8 @@ param(
     [ValidateRange(10,1800)][int]$DownloadTimeoutSeconds = 600,
     [switch]$PublicRedistributionApproved,
     [switch]$AcknowledgeUnverifiedThirdPartyRights,
-    [switch]$UseRangeDownload
+    [switch]$UseRangeDownload,
+    [switch]$AutomaticUpdatesEnabled
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '发行公共函数.ps1')
@@ -54,10 +55,17 @@ try {
 $signature = Get-AuthenticodeSignature -LiteralPath $installer
 if ($signature.Status -notin @('Valid','NotSigned')) { throw '安装包存在损坏或不可信的 Authenticode 签名。' }
 $prepared = Resolve-ReleaseChild $root '独立安装包发布'
+if ($AutomaticUpdatesEnabled) {
+    # 只有布局内信任配置、正式签名和实际应用包一致，才记录为已启用更新。
+    $releaseTool = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'src/iSay.ReleaseTool/iSay.ReleaseTool.csproj'
+    & dotnet run --project $releaseTool -c Release -- --verify-publication $root
+    if ($LASTEXITCODE -ne 0) { throw '应用更新签名预检失败，不能标记已启用自动更新。' }
+}
 New-Item -ItemType Directory -Path $prepared -Force | Out-Null
 $checksum = Join-Path $prepared 'SHA256SUMS.txt'
 ($hash + '  ' + $fileName) | Set-Content -LiteralPath $checksum -Encoding ascii
 $notesPath = Join-Path $prepared '安装包发行说明.md'
+$updateNote = if ($AutomaticUpdatesEnabled) { '已启用官网签名更新源，默认自动检查；也可在设置最后的“关于”页手动检查、下载并安装应用更新。' } else { '当前客户端自动更新源未启用。手动下载安装与自动更新是两个独立流程。' }
 $notes = @"
 # iSay $version Windows 完整安装预览
 
@@ -68,7 +76,7 @@ $notes = @"
 - SHA256：$hash
 - Windows 发布者签名状态：$($signature.Status)
 - 当前为安装预览；Windows 10 虚拟机新机安装和真实麦克风仍待验收。
-- 当前客户端自动更新源未启用。手动下载安装与自动更新是两个独立流程。
+- $updateNote
 
 原生识别、整理、个性化和词典组件来自第三方软件，部分适配会生成修改后的程序副本。项目未取得单独再分发授权，相关修改、分发与服务使用范围仍未确认；这些二进制不属于 iSay 的 MIT 开源范围，也不代表获得原厂授权或背书。本版本由维护者选择作为完整安装预览发布。GitHub 草稿仅供维护者审阅。
 
@@ -80,7 +88,7 @@ $download = [ordered]@{
     fileName = $fileName; bytes = $size; sha256 = $hash; authenticode = [string]$signature.Status
     url = ('https://github.com/' + $GitHubRepository + '/releases/download/' + $ReleaseTag + '/' + $fileName)
     releaseUrl = ('https://github.com/' + $GitHubRepository + '/releases/tag/' + $ReleaseTag)
-    automaticUpdatesEnabled = $false
+    automaticUpdatesEnabled = [bool]$AutomaticUpdatesEnabled
     thirdPartyRightsVerified = [bool]$PublicRedistributionApproved
     unverifiedThirdPartyRightsAcknowledged = [bool]$AcknowledgeUnverifiedThirdPartyRights
 }

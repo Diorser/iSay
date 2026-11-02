@@ -1,6 +1,7 @@
 {
   "name": "iSay",
   "description": "永久免费的 Windows 中文语音输入法",
+  "slogan": "最好用的中文语音输入法 · 永久免费",
   "website": "https://isay-voice.pages.dev/",
   "englishWebsite": "https://isay-voice.pages.dev/en/",
   "repository": "https://github.com/Diorser/iSay",
@@ -46,6 +47,7 @@
     "自动更新未启用",
     "第三方原生组件单独再分发授权尚未取得，不属于iSay自有MIT许可范围"
   ],
+  "automaticUpdatesEnabled": false,
   "screenshots": {
     "note": "真实0.10.5界面，内容为演示数据。",
     "urls": [

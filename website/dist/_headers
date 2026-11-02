@@ -2,9 +2,15 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-SKito8B5dwjILF4eHE1Wznb0XcYE0Aq+pyX17DBmOmA=' 'sha256-eC0a0QRd9KaPpJbKppHOwT3WTw+RarJ6l0feMF8eGQA='; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-WmjykbehPPHJG/WUKXFXEs/ylwWC+cWcI5LXyCvThOs=' 'sha256-bNfkj0JRbx/ftxAjoxe2o3G3yjBifvvDqwN8NA9qhIE='; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
 /assets/*
   Cache-Control: public, max-age=86400
 /downloads/*
   Cache-Control: no-store
+/updates/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex
+/objects/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Robots-Tag: noindex

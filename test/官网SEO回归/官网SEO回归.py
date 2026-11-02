@@ -79,7 +79,7 @@ for language, relative in [('zh-CN', 'index.html'), ('en', 'en/index.html')]:
     alternates = {a['hreflang']: a['href'] for t, a in page.tags if t == 'link' and a.get('rel') == 'alternate'}
     check(alternates == {'zh-CN': BASE + '/', 'en': BASE + '/en/', 'x-default': BASE + '/'}, '双向语言入口完整')
     check(meta['og:url'] == canonical and meta['og:locale'] in ['zh_CN', 'en_US'], '分享地址与语言正确')
-    check(meta['og:image'].endswith('/social-preview.png') and meta['twitter:card'] == 'summary_large_image', '大图分享卡片')
+    check(urlparse(meta['og:image']).path.endswith('/social-preview.png') and meta['twitter:card'] == 'summary_large_image', '大图分享卡片')
     check(len([t for t, a in page.tags if t == 'h1']) == 1, '唯一一级标题')
     check(len(page.ids) == len(set(page.ids)), '区块编号不重复')
     check(len(page.faq) == 10 and all(q['q'] and q['a'] for q in page.faq), '十条可直接读取的完整问答')

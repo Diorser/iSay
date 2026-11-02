@@ -1,9 +1,14 @@
 {
   "applicationId": "iSay",
-  "channel": "stable",
+  "channel": "preview",
   "architecture": "win-x64",
-  "manifestUrls": [],
-  "publicKeys": {},
+  "manifestUrls": [
+    "https://isay-voice.pages.dev/updates/preview/win-x64.json",
+    "https://raw.githubusercontent.com/Diorser/iSay/main/website/dist/updates/preview/win-x64.json"
+  ],
+  "publicKeys": {
+    "isay-1c1890a1f37f": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAorGBDZY5goU5hIKAeebt\nky0K681VkIY0ZpNPZAXzH6De7fz5vFKa6ylPkM5djBpiI9QuJI+fUd5C78TWkFRo\nGoPoXPuKrbUeLq5iEULu4nb2LiVUvSQ50+ePBRIAFL2JIgC+i52k02ZaAh9tEJ2V\n9EQRPqSxtxZZPBJvAgiwM1MGCTfrv+2N6YjBpixD8ASLQVcgPXcwOsM8tG02REpa\nBiRO4j6nJLarS15kRmpN6Yhb70fpWHBb4rnJ6gDNi1qdXLfhdzZ2Lpe4rDBVnyDe\nNsHQjtIBraIzEx+/RhumpKFycaknRhhExbMl0pNWmPHbsUWm98zgfVr86H9tJIp2\nrO70EjuW2CVwcnTXyJI6o1q63duIPRrbNXbTlF5VFNC+Pvkciv4P4jbqsfCInvr7\nB85gA2gDVZ21qq2swBH4eKRfYI0d0DqvGJzm0DUrEFZkA6HNBPTdEtnaMaJRrdtj\nC4Qt1MVD5tQfBJdt2bxT+Dcyi5hyshWhSA87xQjIEnH9AgMBAAE=\n-----END PUBLIC KEY-----"
+  },
   "minimumSequence": 0,
   "maximumPackageBytes": 536870912,
   "maximumExpandedBytes": 2147483648,

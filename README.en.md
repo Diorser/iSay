@@ -1,10 +1,10 @@
 [简体中文](./README.md)
 
-# <img src="./src/iSay.Desktop/Assets/iSay.png" width="36" alt="iSay icon" /> iSay · Forever-free Chinese voice input for Windows
+# <img src="./src/iSay.Desktop/Assets/iSay.png" width="36" alt="iSay icon" /> iSay · Chinese voice input at its best · Free forever
 
 **Your next sentence doesn't need to be typed one character at a time.**
 
-iSay is built to become your favorite way to type Chinese on Windows. Press Right Alt, speak naturally, and keep your words moving with your thoughts. Refine the result, manage your vocabulary, and return to your local history when you need it.
+iSay brings Chinese voice input to your Windows desktop. Press Right Alt, speak naturally, and keep your words moving with your thoughts. Refine the result, manage your vocabulary, and return to your local history when you need it.
 
 **Free forever · Built for Windows · Chinese expression first**
 
@@ -91,7 +91,7 @@ Version 0.10.5 is still a complete installer preview. Clean Windows 10 installat
 
 First use the recording button inside iSay and check your selected microphone, Windows microphone permissions and connectivity. This helps distinguish shortcut, speech-service and destination-field problems. If the issue remains, [open an issue](https://github.com/Diorser/iSay/issues) with your Windows version, iSay version, target application and reproduction steps. Remove audio, transcripts, accounts, keys, vocabulary and private paths from diagnostics before sharing them.
 
-## Help make Chinese voice input better
+## Chinese voice input at its best · Free forever
 
 If iSay fits your workflow, give the project a **Star** and share it with someone who wants to type less and express more. Found a problem or have an idea? [Tell us](https://github.com/Diorser/iSay/issues).
 

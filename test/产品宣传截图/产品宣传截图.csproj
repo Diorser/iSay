@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <ReleaseLayout>$(MSBuildProjectDirectory)/../../artifacts/Windows发行/0.10.5-20261103-050655/布局</ReleaseLayout>
+    <ReleaseLayout>$(MSBuildProjectDirectory)/../../artifacts/Windows发行/0.10.6-自动更新/布局</ReleaseLayout>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="$(ReleaseLayout)/*.dll"><Private>true</Private></Reference>
