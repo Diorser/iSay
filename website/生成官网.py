@@ -115,7 +115,7 @@ def page(language):
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{escape(title, quote=True)}">
 <meta name="twitter:description" content="{escape(description, quote=True)}"><meta name="twitter:image" content="{SOCIAL}">
 <link rel="icon" type="image/png" href="/assets/iSay.png"><link rel="apple-touch-icon" href="/assets/iSay.png">
-<link rel="stylesheet" href="/assets/site.css?v=20261103-hero-align">
+<link rel="stylesheet" href="/assets/site.css?v=20261103-hero-row">
 <script src="/assets/site.js?v=20261103-slogan2" defer></script><script src="/assets/downloads.js?v=20261103-slogan2" defer></script>
 <script type="application/ld+json">{structured}</script>
 </head>
@@ -125,8 +125,8 @@ def page(language):
 <nav aria-label="{choose('主导航', 'Main navigation')}">{t('a', '功能', 'Features', 'href="#features"')}{t('a', '如何使用', 'How it works', 'href="#start"')}{t('a', '常见问题', 'FAQ', 'href="#faq"')}{t('a', 'GitHub 开源 ↗', 'GitHub ↗', f'class="github-link" href="{REPO}"')}<a class="language" href="{other}" lang="{'zh-CN' if en else 'en'}" aria-label="{choose('Switch to English', '切换到中文')}">{choose('EN', '中文')}</a></nav></header>
 <main id="main">
 <section class="hero" aria-labelledby="hero-title"><div class="hero-inner">
-<div class="hero-top entrance">{t('span', f'Windows · 安装预览 {VERSION}', f'Windows · Installer preview {VERSION}', 'class="edition" data-release-edition')}</div>
-<div class="hero-layout"><div class="hero-copy entrance">{t('span', '永久免费', 'FREE FOREVER', 'class="eyebrow hero-free-badge"')}<h1 class="wordmark" id="hero-title">iSay<span class="brand-dot">.</span></h1>
+<div class="hero-top entrance">{t('span', '永久免费', 'FREE FOREVER', 'class="eyebrow hero-free-badge"')}{t('span', f'Windows · 安装预览 {VERSION}', f'Windows · Installer preview {VERSION}', 'class="edition" data-release-edition')}</div>
+<div class="hero-layout"><div class="hero-copy entrance"><h1 class="wordmark" id="hero-title">iSay<span class="brand-dot">.</span></h1>
 {t('h2', '最好用的\\n中文语音输入法', 'Chinese voice input\\nat its best.', 'id="slogan-title"')}
 {t('p', '按下右 Alt，让文字跟上你的思路。', 'Press RightAlt. Let words follow your thoughts.', 'class="hero-description"')}
 <div class="hero-action">{button('light')}{t('p', 'Windows 10 / 11 · x64 · 无需购买 iSay 订阅', 'Windows 10 / 11 · x64 · No iSay subscription', 'class="download-hint"')}</div>
@@ -198,7 +198,7 @@ Screenshots show the actual released UI populated with example content, not real
 Brand slogan: 最好用的中文语音输入法 · 永久免费 / Chinese voice input at its best · Free forever. This expresses the brand aspiration, not an independently verified ranking. No user-count, award or accuracy-rate claims are made.
 '''
     (DIST / 'llms.txt').write_text(llms, encoding='utf-8')
-    not_found = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>页面未找到 · iSay</title><link rel="stylesheet" href="/assets/site.css?v=20261103-hero-align"><main class="not-found"><img src="/assets/iSay.png" width="64" height="64" alt="iSay"><h1>这页走丢了。</h1><p>回到 iSay，继续把想法说出来。</p><a class="button light" href="/">返回官网 ↗</a></main></html>\n'
+    not_found = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>页面未找到 · iSay</title><link rel="stylesheet" href="/assets/site.css?v=20261103-hero-row"><main class="not-found"><img src="/assets/iSay.png" width="64" height="64" alt="iSay"><h1>这页走丢了。</h1><p>回到 iSay，继续把想法说出来。</p><a class="button light" href="/">返回官网 ↗</a></main></html>\n'
     (DIST / '404.html').write_text(not_found, encoding='utf-8')
     print('已生成静态中英文产品页、FAQ结构化数据、站点地图、产品资料、llms.txt及JSON-LD CSP哈希。')
 

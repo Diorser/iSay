@@ -12,9 +12,9 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.js .reveal{opacity:1;transform:none}}
 
 /* 固定宣传语与免费标记成组展示，保持主次与标题留白。 */
-.hero-free-badge{display:table;margin:0 0 6px;padding:4px 10px;border:1px solid #bcecd580;border-radius:4px;color:var(--green);white-space:nowrap}
+.hero-free-badge{flex:none;margin:0;padding:4px 10px;border:1px solid #bcecd580;border-radius:4px;color:var(--green);white-space:nowrap}
 .slogan-free{display:table;margin:-8px 0 24px;padding:5px 12px;border:1px solid #bcecd565;border-radius:4px;color:var(--green);font-size:14px;font-weight:600;line-height:1.6;letter-spacing:1.5px}.download-copy .slogan-free{margin:-14px 0 28px}.download-copy h2{font-size:clamp(34px,3.5vw,52px);letter-spacing:-1.5px;line-height:1.5}@media(max-width:760px){.slogan-free{font-size:12px;margin-bottom:21px}.download-copy h2{font-size:34px;letter-spacing:-1px}.download-copy .slogan-free{margin-top:-10px}}
 
-.hero-top{justify-content:flex-end}.header nav>.github-link{white-space:nowrap}@media(max-width:760px){.header nav>a.github-link{display:inline-flex;font-size:11px}}
+.hero-top + .hero-layout{margin-top:12px}.header nav>.github-link{white-space:nowrap}@media(max-width:760px){.header nav>a.github-link{display:inline-flex;font-size:11px}}
 
 @media(min-width:761px){.hero-copy{align-self:start}}
