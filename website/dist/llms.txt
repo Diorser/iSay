@@ -6,7 +6,7 @@
 - [Chinese product page](https://isay-voice.pages.dev/): features, populated real UI screenshots, free policy, setup and FAQ.
 - [English product page](https://isay-voice.pages.dev/en/): statically rendered English version.
 - [Product facts](https://isay-voice.pages.dev/product.json): version, platform, pricing scope, defaults, download and known limitations.
-- [Download and release notes](https://github.com/Diorser/iSay/releases/tag/v0.10.6-installer-preview): complete installer preview 0.10.6 and SHA256.
+- [Download and release notes](https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview): complete installer preview 0.10.7 and SHA256.
 - [Source and feedback](https://github.com/Diorser/iSay): own source code, issues and dependency notices.
 
 ## Product facts

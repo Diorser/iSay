@@ -8,9 +8,9 @@ iSay 专为 Windows 打造，支持多语言语音输入。按下右 Alt，把�
 
 **永久免费 · 专为 Windows · 多语言语音输入**
 
-[**免费下载 Windows 版 →**](https://github.com/Diorser/iSay/releases/download/v0.10.6-installer-preview/iSay-0.10.6-win-x64-full.exe) · [访问官网](https://isay-voice.pages.dev/) · [三步开始](#三步开始把说话变成输入) · [反馈与建议](https://github.com/Diorser/iSay/issues)
+[**免费下载 Windows 版 →**](https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe) · [访问官网](https://isay-voice.pages.dev/) · [三步开始](#三步开始把说话变成输入) · [反馈与建议](https://github.com/Diorser/iSay/issues)
 
-Windows 10 / 11 · x64 · 当前安装预览版 0.10.6 · 完整安装包 192.22 MiB
+Windows 10 / 11 · x64 · 当前安装预览版 0.10.7 · 完整安装包 192.29 MiB
 
 ![iSay Windows 多语言语音输入界面：录音控制、识别原文与整理结果](./website/dist/assets/screenshots/voice-input.png)
 
@@ -31,7 +31,7 @@ Windows 10 / 11 · x64 · 当前安装预览版 0.10.6 · 完整安装包 192.22
 
 ## 三步开始，把说话变成输入
 
-1. **下载安装。** [下载完整 Windows 安装包](https://github.com/Diorser/iSay/releases/download/v0.10.6-installer-preview/iSay-0.10.6-win-x64-full.exe)，按向导完成安装。所需的 .NET、VC++ 安装器已经随包提供，无需分别寻找下载。
+1. **下载安装。** [下载完整 Windows 安装包](https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe)，按向导完成安装。所需的 .NET、VC++ 安装器已经随包提供，无需分别寻找下载。
 2. **选好麦克风。** 打开 iSay，确认 Windows 已允许麦克风访问，选择要使用的设备。
 3. **按右 Alt，开始说话。** 把光标放进支持的输入框，按一次右 Alt 开始，再按一次结束。也可以先在 iSay 中查看结果，再复制使用。
 
@@ -85,13 +85,13 @@ iSay 桌面产品永久免费。我们希望语音输入成为每个人都能顺
 
 ### 当前版本适合直接全面使用吗？
 
-当前 0.10.6 仍为完整安装预览版。Windows 10 新机安装和真实麦克风识别尚未完成复验，建议先用自己的麦克风与常用软件试用。安装器尚无 Windows 发布者签名。完整状态与校验文件见[发行说明](./docs/公开/完整安装包发布说明.md)。
+当前 0.10.7 仍为完整安装预览版。Windows 10 新机安装和真实麦克风识别尚未完成复验，建议先用自己的麦克风与常用软件试用。安装器尚无 Windows 发布者签名。完整状态与校验文件见[发行说明](./docs/公开/完整安装包发布说明.md)。
 
 ### 如何获取后续更新？
 
 从 0.10.6 开始，默认启用自动检查更新：启动后延迟 30–60 秒检查，其后约每 12 小时检查一次。你也可以进入 **设置 → 关于 iSay** 手动检查、下载并选择安装；不会自动安装或擅自退出程序。安装前请先结束录音和整理。
 
-**0.10.5 及以前的用户，需要先从官网或 [GitHub Release](https://github.com/Diorser/iSay/releases/tag/v0.10.6-installer-preview) 手动安装一次 0.10.6，才能接入后续更新。** 已有个人设置与开关选择会保留，自动检查也可在“关于”页关闭。详见[自动更新使用与发布](./docs/公开/自动更新使用与发布.md)。
+**0.10.5 及以前的用户，需要先从官网或 [GitHub Release](https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview) 手动安装一次当前版本，才能接入后续更新。** 已有个人设置与开关选择会保留，自动检查也可在“关于”页关闭。详见[自动更新使用与发布](./docs/公开/自动更新使用与发布.md)。
 
 ### 录音后没有文字，或者遇到兼容问题，怎么办？
 
@@ -101,7 +101,7 @@ iSay 桌面产品永久免费。我们希望语音输入成为每个人都能顺
 
 觉得 iSay 顺手，欢迎给项目点一个 **Star**，也欢迎分享给同样需要少打字、多表达的朋友。发现问题、想要新功能，都可以[告诉我们](https://github.com/Diorser/iSay/issues)。
 
-[**免费下载 Windows 版 →**](https://github.com/Diorser/iSay/releases/download/v0.10.6-installer-preview/iSay-0.10.6-win-x64-full.exe) · [查看官网](https://isay-voice.pages.dev/) · [发行说明与 SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.6-installer-preview)
+[**免费下载 Windows 版 →**](https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe) · [查看官网](https://isay-voice.pages.dev/) · [发行说明与 SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview)
 
 <details>
 <summary>开发者：构建、源码与检查</summary>

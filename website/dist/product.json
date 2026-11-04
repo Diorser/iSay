@@ -7,7 +7,7 @@
   "repository": "https://github.com/Diorser/iSay",
   "maintainer": "Diorser",
   "updated": "2026-11-03",
-  "version": "0.10.6",
+  "version": "0.10.7",
   "releaseChannel": "installer-preview",
   "platform": [
     "Windows 10 2004+ x64",
@@ -18,10 +18,10 @@
     "currency": "CNY",
     "policy": "iSay 桌面产品永久免费；第三方服务额度、可用性及主动配置的 API 费用由服务商决定。"
   },
-  "downloadUrl": "https://github.com/Diorser/iSay/releases/download/v0.10.6-installer-preview/iSay-0.10.6-win-x64-full.exe",
-  "releaseUrl": "https://github.com/Diorser/iSay/releases/tag/v0.10.6-installer-preview",
-  "sha256": "23cc1088a34122f2f5efb559fbd4873fd10cdcc59edeb2c99fa7286caa162781",
-  "installerBytes": 201552366,
+  "downloadUrl": "https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe",
+  "releaseUrl": "https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview",
+  "sha256": "1d82a1c5bd87ec23089d20b85851ed292522d26949c34328d80a6084647946b5",
+  "installerBytes": 201626353,
   "features": [
     "多语言语音输入",
     "RightAlt 快捷键启停",
@@ -48,7 +48,7 @@
   ],
   "automaticUpdatesEnabled": true,
   "screenshots": {
-    "note": "真实0.10.6界面，内容为演示数据。",
+    "note": "真实0.10.7界面，内容为演示数据。",
     "urls": [
       "https://isay-voice.pages.dev/assets/screenshots/voice-input.png",
       "https://isay-voice.pages.dev/assets/screenshots/raw-input.png",
