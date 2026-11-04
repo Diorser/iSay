@@ -232,7 +232,8 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
     Func<string, CancellationToken, Task<CompositionRangePreparation?>>? prepareRange = null,
     Task? rangeReady = null, bool guardInitialChromiumBatch = false,
     Func<string, CancellationToken, Task<CompositionRangePreparation?>>? prepareCommittedRange = null,
-    Func<string, string, Func<bool>, CancellationToken, Task<bool>>? refineParagraphs = null) : ICompositionSession
+    Func<string, string, Func<bool>, CancellationToken, Task<bool>>? refineParagraphs = null,
+    Func<CancellationToken, Task<bool>>? canBegin = null) : ICompositionSession
 {
     private bool mayHaveWrittenText;
     public bool MayHaveWrittenText => mayHaveWrittenText;
@@ -277,6 +278,8 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
         beginAttempted = true;
         // 避免无障碍树首次初始化与空组合建立交错，造成宿主把灰色预测纳入初始组合缓存。
         if (rangeReady is not null) await rangeReady.WaitAsync(cancellationToken).ConfigureAwait(false);
+        // 结束时接入的新框在探测和清理旧段后仍可能被改动，建立组合前也要再验证。
+        if (canBegin is not null && !await canBegin(cancellationToken).ConfigureAwait(false)) return last = Rejected();
         return await SubmitCore(TsfCommand.Begin, "", cancellationToken).ConfigureAwait(false);
     }
 

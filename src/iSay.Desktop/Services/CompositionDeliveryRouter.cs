@@ -26,14 +26,13 @@ internal sealed class CompositionDeliveryRouter
     private readonly Func<Guid, CancellationToken, Task<ICompositionSession?>>? captureEmptyComposition;
     public event Action<TsfPipeDiagnostic>? PipeDiagnostic;
     public event Action<string>? CleanupDiagnostic;
+    public event Action<string>? FinalTargetDiagnostic;
 
     public CompositionDeliveryRouter(WindowsInputService input)
     {
         compatibility = new CompatibilityDelivery(input);
-        ICompositionSession? CreateComposition(Guid id, Func<CancellationToken, Task<bool>>? emptyGuard = null)
+        ICompositionSession? CreateComposition(Guid id, TsfEndpoint? endpoint, long revision, Func<CancellationToken, Task<bool>>? emptyGuard = null)
         {
-            var revision = input.PhysicalRevision;
-            var endpoint = TsfEndpoint.CaptureForeground();
             var isChatGpt = endpoint is not null && RequiresInitialBatchGuard(endpoint);
             var rangeSync = endpoint is not null && input.ChromiumRangeSyncEnabled && ChromiumCompositionRangeSync.Supports(endpoint) ?
                 new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint, endpoint.StillHasOriginalFocus, () => input.PhysicalRevision) : null;
@@ -61,23 +60,30 @@ internal sealed class CompositionDeliveryRouter
                     var finalRange = new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint,
                         endpoint.StillHasOriginalFocus, () => input.PhysicalRevision, allowUniqueEditor: true);
                     return await finalRange.RefineParagraphsAsync(expected, text, guard, token).ConfigureAwait(false);
-                });
+                }, canBegin: emptyGuard);
         }
-        captureComposition = id => CreateComposition(id);
+        captureComposition = id => CreateComposition(id, TsfEndpoint.CaptureForeground(), input.PhysicalRevision);
         captureEmptyComposition = async (id, token) =>
         {
+            var revision = input.PhysicalRevision;
             var endpoint = TsfEndpoint.CaptureForeground();
-            if (endpoint is null) return null;
+            if (endpoint is null) { FinalTargetDiagnostic?.Invoke("结束键时没有外部输入窗口"); return null; }
+            bool StillAtStopTarget() => revision == input.PhysicalRevision && endpoint.StillHasOriginalFocus();
             Func<CancellationToken, Task<bool>>? guard;
             if (ChromiumCompositionRangeSync.Supports(endpoint))
             {
-                var probe = new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint, endpoint.StillHasOriginalFocus,
-                    () => input.PhysicalRevision, allowUniqueEditor: true);
+                var probe = new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint, StillAtStopTarget,
+                    () => input.PhysicalRevision, allowUniqueEditor: true, emptyTargetOnly: true);
                 guard = await probe.CaptureEmptyGuardAsync(token).ConfigureAwait(false);
             }
             else guard = await input.CaptureEmptyTargetGuardAsync(token).ConfigureAwait(false);
-            if (guard is null || !endpoint.StillHasOriginalFocus()) return null;
-            return CreateComposition(id, guard);
+            if (guard is null || !StillAtStopTarget()) { FinalTargetDiagnostic?.Invoke("无法确认结束键时的目标为空且有光标"); return null; }
+            return CreateComposition(id, endpoint, revision, async cancellation =>
+            {
+                if (StillAtStopTarget() && await guard(cancellation).ConfigureAwait(false) && StillAtStopTarget()) return true;
+                FinalTargetDiagnostic?.Invoke("提交前空框或焦点已变化");
+                return false;
+            });
         };
     }
 
@@ -152,45 +158,73 @@ internal sealed class CompositionDeliveryRouter
     }
 
     public Task<DeliveryResult> UpdateAsync(Guid session, string text, CancellationToken cancellationToken = default) => DeliverAsync(session, text, false, cancellationToken);
-    public async Task<DeliveryResult> CommitAsync(Guid session, string text, CancellationToken cancellationToken = default)
+    public Task<ICompositionSession?>? CaptureEmptyFinalTarget(Guid session, CancellationToken cancellationToken)
+    {
+        var current = Volatile.Read(ref active);
+        if (captureEmptyComposition is null || current is null || current.Id != session || !current.UseComposition ||
+            current.Committed || current.Composition?.MayHaveWrittenText == true) return null;
+        return ProbeAsync();
+
+        async Task<ICompositionSession?> ProbeAsync()
+        {
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, current.Token);
+            deadline.CancelAfter(TimeSpan.FromMilliseconds(1000));
+            try { return await captureEmptyComposition(Guid.NewGuid(), deadline.Token).WaitAsync(deadline.Token).ConfigureAwait(false); }
+            catch (Exception error) when (IsDeliveryError(error))
+            {
+                FinalTargetDiagnostic?.Invoke($"结束键时的空框检查未完成；HRESULT=0x{error.HResult:X8}");
+                return null;
+            }
+        }
+    }
+
+    public async Task<DeliveryResult> CommitAsync(Guid session, string text, CancellationToken cancellationToken = default,
+        Task<ICompositionSession?>? emptyFinalTarget = null)
     {
         var startedAt = Stopwatch.GetTimestamp();
         while (true)
         {
             var result = await DeliverAsync(session, text, true, cancellationToken).ConfigureAwait(false);
-            if (!result.Success && !result.AwaitingHost && !string.IsNullOrEmpty(text) && !cancellationToken.IsCancellationRequested &&
-                await TryAdoptEmptyFinalTargetAsync(session, cancellationToken).ConfigureAwait(false)) continue;
-            if (!result.AwaitingHost || cancellationToken.IsCancellationRequested || Stopwatch.GetElapsedTime(startedAt).TotalMilliseconds >= 2800) return result;
+            var waitExpired = Stopwatch.GetElapsedTime(startedAt).TotalMilliseconds >= 2800;
+            if (!result.Success && (!result.AwaitingHost || waitExpired) && !string.IsNullOrWhiteSpace(text) &&
+                emptyFinalTarget is not null && !cancellationToken.IsCancellationRequested &&
+                await TryAdoptEmptyFinalTargetAsync(session, emptyFinalTarget, cancellationToken).ConfigureAwait(false)) continue;
+            if (!result.AwaitingHost || cancellationToken.IsCancellationRequested || waitExpired) return result;
             await Task.Delay(100, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async Task<bool> TryAdoptEmptyFinalTargetAsync(Guid session, CancellationToken cancellationToken)
+    private async Task<bool> TryAdoptEmptyFinalTargetAsync(Guid session, Task<ICompositionSession?> candidate, CancellationToken cancellationToken)
     {
-        if (captureEmptyComposition is null) return false;
         await serial.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             var current = Volatile.Read(ref active);
             if (current is null || current.Id != session || !current.UseComposition || current.Committed ||
-                current.FinalTargetAttempted || current.WaitingConfirmation || cleanupBacklog.Count != 0 ||
+                current.FinalTargetAttempted || cleanupBacklog.Count != 0 ||
                 current.Token.IsCancellationRequested || current.Composition?.MayHaveWrittenText == true) return false;
             current.FinalTargetAttempted = true;
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, current.Token);
             deadline.CancelAfter(TimeSpan.FromMilliseconds(1800));
+            var replacement = await candidate.WaitAsync(deadline.Token).ConfigureAwait(false);
+            if (replacement is null || !ReferenceEquals(active, current)) return false;
             // 只有明确没有发过正文，且旧空组合已确认结束，才能在用户结束时接住当前空输入框。
             if (current.Composition is { } previous)
             {
                 var cancelled = await previous.CancelAsync(deadline.Token).ConfigureAwait(false);
-                if (cancelled.HResult != 0 || cancelled.State is not (TsfCompositionState.Idle or TsfCompositionState.Committed)) return false;
+                if (!IsCleanedUp(cancelled))
+                {
+                    FinalTargetDiagnostic?.Invoke($"原空组合未确认结束；HRESULT=0x{cancelled.HResult:X8}；状态={cancelled.State}");
+                    return false;
+                }
             }
-            var replacement = await captureEmptyComposition(Guid.NewGuid(), deadline.Token).ConfigureAwait(false);
-            if (replacement is null || !ReferenceEquals(active, current) || current.Token.IsCancellationRequested) return false;
+            if (!ReferenceEquals(active, current) || current.Token.IsCancellationRequested) return false;
             current.Composition = replacement; current.Blocked = false; current.WaitingConfirmation = false;
             current.RetryAt = 0; current.LastText = ""; current.LastUpdateSucceeded = false;
             var begin = await InvokeAsync(current, token => BeginCompositionAsync(replacement, token), deadline.Token).ConfigureAwait(false);
             current.Begun = begin.Success;
             current.Blocked |= !begin.Success && !begin.AwaitingHost;
+            FinalTargetDiagnostic?.Invoke(begin.Success ? "已接住结束键时的空输入框" : "结束键时的空输入框尚未建立组合");
             return begin.Success || begin.AwaitingHost;
         }
         catch (Exception error) when (IsDeliveryError(error)) { return false; }
@@ -367,9 +401,7 @@ internal sealed class CompositionDeliveryRouter
                 try
                 {
                     var reply = await session.Composition.CancelAsync(deadline.Token).WaitAsync(deadline.Token).ConfigureAwait(false);
-                    if (reply.State == TsfCompositionState.HostTerminated && reply.HResult != unchecked((int)0x800700AA) && reply.HResult != unchecked((int)0x8000000A) ||
-                        reply.HResult == 0 && reply.State is TsfCompositionState.Idle or TsfCompositionState.Committed)
-                        return cleaned = true;
+                    if (IsCleanedUp(reply)) return cleaned = true;
                     if (reply.HResult != unchecked((int)0x800700AA) && reply.HResult != unchecked((int)0x8000000A) && reply.State != TsfCompositionState.FocusUnavailable)
                     {
                         CleanupDiagnostic?.Invoke($"旧会话={session.Id:N};清理拒绝;HRESULT=0x{reply.HResult:X8};状态={reply.State};确认序号={reply.AcceptedSequence}");
@@ -384,6 +416,10 @@ internal sealed class CompositionDeliveryRouter
         catch (Exception error) when (IsDeliveryError(error)) { return false; }
         finally { if (cleaned) session.Cancellation.Dispose(); }
     }
+
+    private static bool IsCleanedUp(TsfReply reply) => !reply.IsPending &&
+        (reply.State == TsfCompositionState.HostTerminated ||
+            reply.HResult == 0 && reply.State is TsfCompositionState.Idle or TsfCompositionState.Committed);
 
     private static DeliveryResult ConvertReply(TsfReply reply, bool final)
     {

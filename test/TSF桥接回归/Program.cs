@@ -20,6 +20,7 @@ internal static partial class Program
             await RunInitialReadinessTests();
             await RunInitialBatchGuardTests();
             await RunSelectedRefinementTests();
+            await RunStopEmptyTargetGuards();
             var session = Guid.NewGuid();
             var endpoint = Endpoint();
             var requests = new List<Request>();

@@ -211,6 +211,7 @@ public partial class App : Application
         delivery = new CompositionDeliveryRouter(input);
         delivery.PipeDiagnostic += OnCompositionDiagnostic;
         delivery.CleanupDiagnostic += detail => LogEvent("交付清理", detail);
+        delivery.FinalTargetDiagnostic += detail => LogEvent("结束空框接入", detail);
         input.Diagnostic += (_, detail) => LogEvent("输入核验", $"阶段={detail.Stage};匹配={detail.MatchKind};焦点={detail.FocusIdentity};预期长度={detail.ExpectedLength};实际长度={detail.ActualLength};耗时毫秒={detail.ElapsedMilliseconds};最终={detail.IsFinal};旧快照长度={detail.PreviousSnapshotLength};新快照长度={detail.NextSnapshotLength};已发快照长度={detail.SentSnapshotLength};保留前缀长度={detail.KeptPrefixLength};编辑起点={detail.EditStart};删除长度={detail.RemovedLength};实际插入长度={detail.InsertedLength}");
         input.RecordingRequested += (_, action) => Dispatcher.BeginInvoke(async () => await HandleRecordingHotkeyAsync(action.Action));
         input.InputActivity += (_, _) => QueueInputActivity();
@@ -791,6 +792,10 @@ public partial class App : Application
     {
         if (stopping || !vm.IsRecording) return;
         stopping = true;
+        // 按结束键时固定新空框；等待句尾或整理期间不能追着用户的焦点走。
+        var emptyFinalTarget = reason == "用户结束" && !previewOnly && !localTranscript && testOutputPath is null &&
+            activeSettings.OutputMode == "live" && activeSettings.InputBackend == "tsf" ?
+            delivery.CaptureEmptyFinalTarget(sessionId, lifetime.Token) : null;
         PreserveLatestRecognizedText();
         lastStopReason = reason;
         LogEvent("录音结束请求", $"会话={sessionId:N};原因={reason};快照数={Interlocked.Read(ref speechSnapshotCount)};稳定快照数={Interlocked.Read(ref recordingFinalSnapshots)}");
@@ -851,7 +856,7 @@ public partial class App : Application
                 }
                 else if (string.IsNullOrWhiteSpace(result.Text)) delivered = DeliveryResult.Retained("没有识别到文字");
                 else if (testOutputPath is not null) delivered = WriteTestOutput(result.Text, true);
-                else delivered = await delivery.CommitAsync(sessionId, result.Text, lifetime.Token);
+                else delivered = await delivery.CommitAsync(sessionId, result.Text, lifetime.Token, emptyFinalTarget);
                 deliveryStatus = delivered.Message;
                 finalDelivered = delivered.Success;
                 if (delivered.Success && testOutputPath is null && delivery?.UsesComposition(sessionId) == true)

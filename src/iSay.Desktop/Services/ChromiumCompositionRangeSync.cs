@@ -17,6 +17,7 @@ internal sealed class ChromiumCompositionRangeSync
     private readonly long initialRevision;
     private readonly Task<AutomationElement?> original;
     private readonly bool allowUniqueEditor;
+    private readonly bool emptyTargetOnly;
     private IUIAutomation? automation;
     private IUIAutomation Automation => automation ??= new CUIAutomation();
     private bool established;
@@ -39,22 +40,39 @@ internal sealed class ChromiumCompositionRangeSync
                 {
                     if (revision() != initialRevision || !hasFocus()) return false;
                     var focused = FocusedInOriginalWindow();
-                    if (focused is null || Automation.CompareElements(captured, focused) == 0 || focused.CurrentIsPassword != 0 ||
-                        focused.GetCurrentPattern(10014) is not IUIAutomationTextPattern pattern) return false;
-                    var actual = pattern.DocumentRange.GetText(2);
-                    if (!actual.All(character => character is '\r' or '\n')) return false;
-                    // 多取一个字符以排除前两个换行之后仍有正文的输入框。
-                    actual = pattern.DocumentRange.GetText(TsfCompositionClient.MaximumTextLength + 1);
+                    if (focused is null || Automation.CompareElements(captured, focused) == 0 || !IsFocusedEditableTarget(focused) ||
+                        focused.GetCurrentPattern(10014) is not IUIAutomationTextPattern pattern)
+                    { Diagnostic?.Invoke("空框焦点或文本范围不符", focused?.CurrentControlType ?? 0, 0); return false; }
+                    var document = pattern.DocumentRange;
+                    if (document.GetAttributeValue(40015) is true) { Diagnostic?.Invoke("空框文本只读", 0, 0); return false; }
+                    // 空编辑器可能暴露一个结构换行；不能把真实空格或多行用户内容当成占位符。
+                    var actual = document.GetText(3);
                     var selections = pattern.GetSelection();
-                    return actual.All(character => character is '\r' or '\n') && selections.Length == 1 &&
+                    Diagnostic?.Invoke("空框正文长度与选区数", actual.Length, selections?.Length ?? -1);
+                    if (focused.GetCurrentPattern(10002) is IUIAutomationValuePattern value)
+                    {
+                        var editableValue = value.CurrentValue;
+                        Diagnostic?.Invoke("空框值长度与换行标记", editableValue.Length, editableValue.All(character => character is '\r' or '\n') ? 1 : 0);
+                        if (value.CurrentIsReadOnly != 0 || editableValue is not ("" or "\r" or "\n" or "\r\n")) return false;
+                    }
+                    return actual is ("" or "\r" or "\n" or "\r\n") && selections?.Length == 1 &&
                         selections.GetElement(0).CompareEndpoints(TextPatternRangeEndpoint.TextPatternRangeEndpoint_Start,
                             selections.GetElement(0), TextPatternRangeEndpoint.TextPatternRangeEndpoint_End) == 0 &&
                         revision() == initialRevision && hasFocus();
                 }, cancellation).ConfigureAwait(false);
             }
-            catch (Exception error) when (IsHostError(error)) { return false; }
+            catch (Exception error) when (IsHostError(error)) { Diagnostic?.Invoke("空框文本探测异常", error.HResult, 0); return false; }
         }
         return await CheckEmpty(token).ConfigureAwait(false) ? CheckEmpty : null;
+    }
+
+    private static bool IsFocusedEditableTarget(AutomationElement element)
+    {
+        if (element.CurrentControlType != 50004 || element.CurrentIsEnabled == 0 ||
+            element.CurrentIsKeyboardFocusable == 0 || element.CurrentIsPassword != 0) return false;
+        if (element.CurrentHasKeyboardFocus != 0) return true;
+        // 文档节点持有焦点标记时，仅凭有一个编辑框不足以证明用户已点进去。
+        return element.GetCurrentPattern(10024) is IUIAutomationTextPattern2 text && text.GetCaretRange(out var active) is not null && active != 0;
     }
 
     internal static bool Supports(TsfEndpoint endpoint)
@@ -67,10 +85,11 @@ internal sealed class ChromiumCompositionRangeSync
     }
 
     internal ChromiumCompositionRangeSync(BoundedInputExecutor executor, TsfEndpoint endpoint, Func<bool> hasFocus, Func<long> revision,
-        bool allowUniqueEditor = false)
+        bool allowUniqueEditor = false, bool emptyTargetOnly = false)
     {
         this.executor = executor; this.endpoint = endpoint; this.hasFocus = hasFocus; this.revision = revision;
         this.allowUniqueEditor = allowUniqueEditor;
+        this.emptyTargetOnly = emptyTargetOnly;
         initialRevision = revision();
         original = CaptureAsync();
     }
@@ -87,7 +106,10 @@ internal sealed class ChromiumCompositionRangeSync
             if (GetWindowThreadProcessId(handle, out owner) == 0 || owner != endpoint.ProcessId) return null;
         }
         var root = Automation.ElementFromHandle(handle);
-        var focused = root?.FindFirst(TreeScope.TreeScope_Subtree, Automation.CreatePropertyCondition(30008, true));
+        var focusedCondition = Automation.CreatePropertyCondition(30008, true);
+        var focused = emptyTargetOnly ? root?.FindFirst(TreeScope.TreeScope_Subtree,
+            Automation.CreateAndCondition(focusedCondition, Automation.CreatePropertyCondition(30003, 50004))) : null;
+        focused ??= root?.FindFirst(TreeScope.TreeScope_Subtree, focusedCondition);
         Diagnostic?.Invoke("焦点类型", focused?.CurrentControlType ?? 0, root?.CurrentControlType ?? 0);
         if (!allowUniqueEditor || focused is null || focused.CurrentControlType is not (50030 or 50032)) return focused;
         // 当前 ChatGPT 将焦点标在根文档，而非编辑节点。只在最终整理中允许唯一可编辑槽，绝不按相似正文找框。
@@ -112,6 +134,7 @@ internal sealed class ChromiumCompositionRangeSync
                     var element = FocusedInOriginalWindow();
                     if (element is null || element.CurrentIsPassword != 0 || revision() != initialRevision)
                     { Diagnostic?.Invoke("未捕获原元素", attempt, 0); return null; }
+                    if (emptyTargetOnly) return IsFocusedEditableTarget(element) ? element : null;
                     var raw = element.GetCurrentPattern(10014);
                     if (raw is not IUIAutomationTextPattern) { unsupportedPattern = true; Diagnostic?.Invoke("不支持文本模式", 0, 0); }
                     else
