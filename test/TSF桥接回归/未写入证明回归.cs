@@ -51,8 +51,6 @@ internal static partial class Program
             if (acceptedFirstUpdate) await session.UpdateAsync("已经显示的字");
             Check(!(await session.UpdateAsync("首批被宿主拒绝")).Applied && session.MayHaveWrittenText == acceptedFirstUpdate,
                 acceptedFirstUpdate ? "范围不匹配不能抹掉先前已写正文" : "零字且未接受的范围不匹配可证明首批没有写入");
-            Check(session.CanProbeEmptyFinalTarget != acceptedFirstUpdate,
-                "只读备用空框探测与实际写入资格分离，已经确认正文则无需探测");
             Check((await session.CancelAsync()).Applied, "范围不匹配后仍能结束旧组合");
             await server;
         }
@@ -69,11 +67,9 @@ internal static partial class Program
             await session.BeginAsync();
             var pending = session.UpdateAsync("首批还在路上");
             await entered.Task;
-            Check(session.MayHaveWrittenText && session.CanProbeEmptyFinalTarget,
-                "首笔回复未返回时只可探测结束目标，仍不能推定可补填全文");
+            Check(session.MayHaveWrittenText, "首笔回复未返回时仍保留写入未确认的事实");
             release.Set(); await pending; await server;
-            Check(!session.CanProbeEmptyFinalTarget && session.MayHaveWrittenText,
-                "首笔确认成功即关闭备用空框探测，不造成第二份正文");
+            Check(session.MayHaveWrittenText, "首笔确认成功后保留已写正文记录");
         }
     }
 }

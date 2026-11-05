@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>iSay</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.10.8</Version>
+    <Version>0.10.9</Version>
     <CompositionVersion>0.9.7</CompositionVersion>
     <ApplicationIcon>Assets/iSay.ico</ApplicationIcon>
   </PropertyGroup>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/iSay.Desktop/Services/RefinementClipboardLease.cs" Link="RefinementClipboardLease.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/RefinementClipboardFormat.cs" Link="RefinementClipboardFormat.cs" />
+    <PackageReference Include="Interop.UIAutomationClient" Version="10.19041.0" />
+    <Compile Remove="离屏业务/**/*.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/CompositionDeliveryRouter.cs" Link="CompositionDeliveryRouter.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/TsfCompositionClient.cs" Link="TsfCompositionClient.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/TsfLearningClient.cs" Link="TsfLearningClient.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/WindowsInputService.cs" Link="WindowsInputService.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/ChromiumCompositionRangeSync.cs" Link="ChromiumCompositionRangeSync.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/OwnedTextRange.cs" Link="OwnedTextRange.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/BoundedInputExecutor.cs" Link="BoundedInputExecutor.cs" />
+    <Compile Include="../../src/iSay.Desktop/Services/GlobalHotkeyState.cs" Link="GlobalHotkeyState.cs" />
+    <Compile Include="../../src/iSay.Voice/HotkeyDefinition.cs" Link="HotkeyDefinition.cs" />
+  </ItemGroup>
+</Project>

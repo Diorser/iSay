@@ -163,11 +163,6 @@ internal sealed class CompositionDeliveryRouter
     {
         var current = Volatile.Read(ref active);
         if (captureEmptyComposition is null || current is null || current.Id != session || !current.UseComposition || current.Committed) return null;
-        if (current.Composition?.CanProbeEmptyFinalTarget == false)
-        {
-            FinalTargetDiagnostic?.Invoke($"会话={session:N};原框已写入或写入待确认，不向新空框重发全文");
-            return null;
-        }
         return ProbeAsync();
 
         async Task<ICompositionSession?> ProbeAsync()
@@ -209,19 +204,20 @@ internal sealed class CompositionDeliveryRouter
             var current = Volatile.Read(ref active);
             if (current is null || current.Id != session || !current.UseComposition || current.Committed ||
                 current.FinalTargetAttempted || cleanupBacklog.Count != 0 ||
-                current.Token.IsCancellationRequested || current.Composition?.MayHaveWrittenText == true) return false;
+                current.Token.IsCancellationRequested) return false;
             current.FinalTargetAttempted = true;
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, current.Token);
             deadline.CancelAfter(TimeSpan.FromMilliseconds(1800));
             var replacement = await candidate.WaitAsync(deadline.Token).ConfigureAwait(false);
             if (replacement is null || !ReferenceEquals(active, current)) return false;
-            // 只有明确没有发过正文，且旧空组合已确认结束，才能在用户结束时接住当前空输入框。
+            // 用户明确结束时以当前已核验的空框为准。先确认旧组合结束，再重新核验空框；
+            // 不能因为曾向旧位置写过字就丢弃转写，也不能向已有文字的当前框追加全文。
             if (current.Composition is { } previous)
             {
                 var cancelled = await previous.CancelAsync(deadline.Token).ConfigureAwait(false);
                 if (!IsCleanedUp(cancelled))
                 {
-                    FinalTargetDiagnostic?.Invoke($"原空组合未确认结束；HRESULT=0x{cancelled.HResult:X8}；状态={cancelled.State}");
+                    FinalTargetDiagnostic?.Invoke($"原组合未确认结束；HRESULT=0x{cancelled.HResult:X8}；状态={cancelled.State}");
                     return false;
                 }
             }
@@ -231,7 +227,7 @@ internal sealed class CompositionDeliveryRouter
             var begin = await InvokeAsync(current, token => BeginCompositionAsync(replacement, token), deadline.Token).ConfigureAwait(false);
             current.Begun = begin.Success;
             current.Blocked |= !begin.Success && !begin.AwaitingHost;
-            FinalTargetDiagnostic?.Invoke($"会话={session:N};" + (begin.Success ? "已接住结束键时的空输入框" : "结束键时的空输入框尚未建立组合"));
+            FinalTargetDiagnostic?.Invoke($"会话={session:N};" + (begin.Success ? "已接住结束键时的空输入框" : $"结束键时的空输入框尚未建立组合；{begin.Message}"));
             return begin.Success || begin.AwaitingHost;
         }
         catch (Exception error) when (IsDeliveryError(error)) { return false; }

@@ -213,9 +213,8 @@ internal sealed class TsfCompositionClient(TsfEndpoint endpoint, Action<TsfPipeD
 /// <summary>同一录音段绑定同一目标和递增序号；遇到不确定结果绝不改用普通键入重发。</summary>
 internal interface ICompositionSession
 {
-    // 未实现此证明的后端默认按“可能写过”处理，不能切换目标重发。
+    // 保留正文可能已写入的事实；不能用后来的拒绝回复抹掉此前已确认的正文。
     bool MayHaveWrittenText => true;
-    bool CanProbeEmptyFinalTarget => !MayHaveWrittenText;
     bool RefinementRecreatedComposition => false;
     ITsfLearningObserver? TryCreateLearningObserver() => null;
     Task<TsfReply> BeginAsync(CancellationToken cancellationToken = default);
@@ -238,8 +237,6 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
 {
     private bool mayHaveWrittenText;
     public bool MayHaveWrittenText => mayHaveWrittenText;
-    // 首笔在途时允许只读固定结束键目标；真正补填仍必须等原笔明确证明没有写入。
-    public bool CanProbeEmptyFinalTarget => Volatile.Read(ref acknowledgedNonemptyUpdates) == 0 && !committedSuccessfully;
     public bool RefinementRecreatedComposition => replacementLearningSession is not null || paragraphRefined;
     public ITsfLearningObserver? TryCreateLearningObserver() => !committedSuccessfully || paragraphRefined ? null : replacementLearningSession is { } actual ?
         new RefinementLearningObserver(client.CreateLearningObserver(), session, actual) : client.CreateLearningObserver();

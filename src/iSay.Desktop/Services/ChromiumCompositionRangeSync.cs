@@ -63,7 +63,17 @@ internal sealed class ChromiumCompositionRangeSync
             }
             catch (Exception error) when (IsHostError(error)) { Diagnostic?.Invoke("空框文本探测异常", error.HResult, 0); return false; }
         }
-        return await CheckEmpty(token).ConfigureAwait(false) ? CheckEmpty : null;
+        // Chromium 的焦点与正文无障碍快照可能稍晚于页面变化。只读短等同一目标，
+        // 不重新选框、不写正文；许可生成后的提交前检查仍须一次通过。
+        var emptySamples = 0;
+        for (var attempt = 0; attempt < 9; attempt++)
+        {
+            emptySamples = await CheckEmpty(token).ConfigureAwait(false) ? emptySamples + 1 : 0;
+            if (emptySamples >= 2) return CheckEmpty;
+            if (revision() != initialRevision || !hasFocus() || attempt == 8) break;
+            await Task.Delay(20, token).ConfigureAwait(false);
+        }
+        return null;
     }
 
     private static bool IsFocusedEditableTarget(AutomationElement element)
