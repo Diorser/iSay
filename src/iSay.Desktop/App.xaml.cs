@@ -800,7 +800,7 @@ public partial class App : Application
         lastStopReason = reason;
         LogEvent("录音结束请求", $"会话={sessionId:N};原因={reason};快照数={Interlocked.Read(ref speechSnapshotCount)};稳定快照数={Interlocked.Read(ref recordingFinalSnapshots)}");
         performance?.MarkStopRequested();
-        if (diagnosticPath is null) floating.SetProcessing("正在确认句尾，完成后立即结束编辑状态。", "确认句尾");
+        if (diagnosticPath is null && !localTranscript) floating.SetProcessing("正在确认句尾，完成后立即结束编辑状态。", "确认句尾");
         vm.StatusText = "录音已结束，正在确认句尾。";
         FormattingWork? formattingWork = null;
         var recognitionStopped = false;
@@ -840,13 +840,13 @@ public partial class App : Application
                 : await formatter.FormatAsync(vm.RawText, activeSettings, lifetime.Token);
             vm.FormattedText = result.Text;
             string deliveryStatus;
-            // 等待尚在完成的实时写入，最后只更新同一段已验证范围。
-            while (Volatile.Read(ref deliveryPending) != 0) await Task.Delay(30);
             if (previewOnly) deliveryStatus = "测试预览已保留";
             else if (localTranscript) { deliveryStatus = string.IsNullOrWhiteSpace(result.Text) ? "没有识别到文字，请检查麦克风后重试。" : "转写已完成，可复制结果或查看原文。"; finalDelivered = !string.IsNullOrWhiteSpace(result.Text); }
             else if (activeSettings.OutputMode == "clipboard") { var copied = await input.CopyAsync(result.Text); deliveryStatus = copied.Message; finalDelivered = copied.Success; }
             else
             {
+                // 只有写向外部输入框才等待实时写入；本页转写与剪贴板不受上一段宿主响应影响。
+                while (Volatile.Read(ref deliveryPending) != 0) await Task.Delay(30);
                 if (deliveryCapture is not null) await deliveryCapture;
                 DeliveryResult delivered;
                 if (!userFinished)
@@ -867,6 +867,7 @@ public partial class App : Application
             if (finalDelivered && !previewOnly && !localTranscript && activeSettings.OutputMode != "clipboard") performance?.MarkDelivery();
             vm.StatusText = result.Warning is null ? deliveryStatus : deliveryStatus + " · " + result.Warning;
             if (!userFinished) vm.StatusText = reason + "，录音已结束；" + vm.StatusText;
+            if (localTranscript) LogEvent("本页转写交付", $"会话={sessionId:N};成功={finalDelivered};结果长度={result.Text.Length}");
             SaveHistory(result.Method);
             // 只有正常结束且交付成功的最终原文才进入学习；不等待学习网络请求，也不把整理后的改写当作语音原文。
             if (userFinished && finalDelivered && !previewOnly) QueueVocabularyLearning(sessionId, vm.RawText, activeSettings);

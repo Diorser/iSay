@@ -33,8 +33,9 @@ internal sealed class CompositionDeliveryRouter
         compatibility = new CompatibilityDelivery(input);
         ICompositionSession? CreateComposition(Guid id, TsfEndpoint? endpoint, long revision, Func<CancellationToken, Task<bool>>? emptyGuard = null)
         {
-            var isChatGpt = endpoint is not null && RequiresInitialBatchGuard(endpoint);
-            var rangeSync = endpoint is not null && input.ChromiumRangeSyncEnabled && ChromiumCompositionRangeSync.Supports(endpoint) ?
+            var isChromium = endpoint is not null && ChromiumCompositionRangeSync.Supports(endpoint);
+            var isChatGpt = isChromium && RequiresInitialBatchGuard(endpoint!);
+            var rangeSync = endpoint is not null && input.ChromiumRangeSyncEnabled && isChromium ?
                 new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint, endpoint.StillHasOriginalFocus, () => input.PhysicalRevision) : null;
             var focusGuard = endpoint is null ? null : input.CaptureCompositionFocusGuard(endpoint.StillHasOriginalFocus);
             return endpoint is null ? null : new TsfCompositionSession(new TsfCompositionClient(endpoint, value => PipeDiagnostic?.Invoke(value)), id,
@@ -47,7 +48,7 @@ internal sealed class CompositionDeliveryRouter
                 }, async token => await focusGuard!(token).ConfigureAwait(false) && (emptyGuard is null || await emptyGuard(token).ConfigureAwait(false)),
                 rangeSync is null ? null : rangeSync.PrepareAsync, rangeSync?.Ready,
                 guardInitialChromiumBatch: isChatGpt,
-                prepareCommittedRange: !isChatGpt ? null : async (expected, token) =>
+                prepareCommittedRange: !isChromium ? null : async (expected, token) =>
                 {
                     // 仅后台整理写回时选择已核对的自有整段；连续出字不启用历史范围同步实验。
                     var finalRange = new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint,
@@ -55,7 +56,7 @@ internal sealed class CompositionDeliveryRouter
                     await finalRange.Ready.WaitAsync(token).ConfigureAwait(false);
                     return await finalRange.PrepareAsync(expected, token).ConfigureAwait(false);
                 },
-                refineParagraphs: !isChatGpt ? null : async (expected, text, guard, token) =>
+                refineParagraphs: !isChromium ? null : async (expected, text, guard, token) =>
                 {
                     var finalRange = new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint,
                         endpoint.StillHasOriginalFocus, () => input.PhysicalRevision, allowUniqueEditor: true);
@@ -74,6 +75,7 @@ internal sealed class CompositionDeliveryRouter
             {
                 var probe = new ChromiumCompositionRangeSync(input.CompositionExecutor, endpoint, StillAtStopTarget,
                     () => input.PhysicalRevision, allowUniqueEditor: true, emptyTargetOnly: true);
+                probe.Diagnostic = (stage, first, second) => FinalTargetDiagnostic?.Invoke($"候选={id:N};阶段={stage};值={first}/{second}");
                 guard = await probe.CaptureEmptyGuardAsync(token).ConfigureAwait(false);
             }
             else guard = await input.CaptureEmptyTargetGuardAsync(token).ConfigureAwait(false);
@@ -90,7 +92,6 @@ internal sealed class CompositionDeliveryRouter
     private static bool RequiresInitialBatchGuard(TsfEndpoint endpoint)
     {
         // 本轮只对已实测的 ChatGPT 桌面 Chromium 宿主启用首批保护，其他程序保持原有交付节奏。
-        if (!ChromiumCompositionRangeSync.Supports(endpoint)) return false;
         try
         {
             using var process = Process.GetProcessById((int)endpoint.ProcessId);
@@ -161,15 +162,21 @@ internal sealed class CompositionDeliveryRouter
     public Task<ICompositionSession?>? CaptureEmptyFinalTarget(Guid session, CancellationToken cancellationToken)
     {
         var current = Volatile.Read(ref active);
-        if (captureEmptyComposition is null || current is null || current.Id != session || !current.UseComposition ||
-            current.Committed || current.Composition?.MayHaveWrittenText == true) return null;
+        if (captureEmptyComposition is null || current is null || current.Id != session || !current.UseComposition || current.Committed) return null;
+        if (current.Composition?.CanProbeEmptyFinalTarget == false)
+        {
+            FinalTargetDiagnostic?.Invoke($"会话={session:N};原框已写入或写入待确认，不向新空框重发全文");
+            return null;
+        }
         return ProbeAsync();
 
         async Task<ICompositionSession?> ProbeAsync()
         {
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, current.Token);
             deadline.CancelAfter(TimeSpan.FromMilliseconds(1000));
-            try { return await captureEmptyComposition(Guid.NewGuid(), deadline.Token).WaitAsync(deadline.Token).ConfigureAwait(false); }
+            var candidate = Guid.NewGuid();
+            FinalTargetDiagnostic?.Invoke($"会话={session:N};候选={candidate:N};检查结束键时的空框");
+            try { return await captureEmptyComposition(candidate, deadline.Token).WaitAsync(deadline.Token).ConfigureAwait(false); }
             catch (Exception error) when (IsDeliveryError(error))
             {
                 FinalTargetDiagnostic?.Invoke($"结束键时的空框检查未完成；HRESULT=0x{error.HResult:X8}");
@@ -224,7 +231,7 @@ internal sealed class CompositionDeliveryRouter
             var begin = await InvokeAsync(current, token => BeginCompositionAsync(replacement, token), deadline.Token).ConfigureAwait(false);
             current.Begun = begin.Success;
             current.Blocked |= !begin.Success && !begin.AwaitingHost;
-            FinalTargetDiagnostic?.Invoke(begin.Success ? "已接住结束键时的空输入框" : "结束键时的空输入框尚未建立组合");
+            FinalTargetDiagnostic?.Invoke($"会话={session:N};" + (begin.Success ? "已接住结束键时的空输入框" : "结束键时的空输入框尚未建立组合"));
             return begin.Success || begin.AwaitingHost;
         }
         catch (Exception error) when (IsDeliveryError(error)) { return false; }

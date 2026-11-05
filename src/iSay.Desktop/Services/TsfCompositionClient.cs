@@ -215,6 +215,7 @@ internal interface ICompositionSession
 {
     // 未实现此证明的后端默认按“可能写过”处理，不能切换目标重发。
     bool MayHaveWrittenText => true;
+    bool CanProbeEmptyFinalTarget => !MayHaveWrittenText;
     bool RefinementRecreatedComposition => false;
     ITsfLearningObserver? TryCreateLearningObserver() => null;
     Task<TsfReply> BeginAsync(CancellationToken cancellationToken = default);
@@ -237,6 +238,8 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
 {
     private bool mayHaveWrittenText;
     public bool MayHaveWrittenText => mayHaveWrittenText;
+    // 首笔在途时允许只读固定结束键目标；真正补填仍必须等原笔明确证明没有写入。
+    public bool CanProbeEmptyFinalTarget => Volatile.Read(ref acknowledgedNonemptyUpdates) == 0 && !committedSuccessfully;
     public bool RefinementRecreatedComposition => replacementLearningSession is not null || paragraphRefined;
     public ITsfLearningObserver? TryCreateLearningObserver() => !committedSuccessfully || paragraphRefined ? null : replacementLearningSession is { } actual ?
         new RefinementLearningObserver(client.CreateLearningObserver(), session, actual) : client.CreateLearningObserver();
@@ -303,13 +306,13 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
                 return refinementText == text && acknowledgedText == text && last.HResult == 0 && last.State == TsfCompositionState.Committed ? last : Rejected();
             // 此处使用提交前固定的版本，不能沿用录音开始时的版本；结束热键本身也属于真实按键。
             if (refinementGuard is null || !refinementGuard()) return Rejected();
+            if (text == acknowledgedText) return last;
             if (prepareCommittedRange is not null)
             {
                 // 已实测 ChatGPT 会把无组合的 SetText 修订重复应用；只在结束后核验自有整段范围。
                 // 实时更新不选择正文；已有前后文、用户改字或选区无法确认时保留整理结果，绝不盲写。
                 refinementAttempted = true;
                 refinementText = text;
-                if (text == acknowledgedText) return last;
                 return await RefineSelectedCore(text, cancellationToken).ConfigureAwait(false);
             }
             if (client.HasKnownUnsafeRefinementUndo())
@@ -617,9 +620,12 @@ internal sealed class TsfCompositionSession(TsfCompositionClient client, Guid se
         {
             if (text.Length > 0) mayHaveWrittenText = true;
             last = await client.SendAsync(command, session, request.Sequence, text, cancellationToken).ConfigureAwait(false);
-            // 原生端的 S_FALSE/FocusUnavailable 在 Edit 之前返回，且该序号未被接受；这与丢失回复不同。
-            if (!previouslyWritten && last.HResult == 1 && last.State == TsfCompositionState.FocusUnavailable &&
-                last.TextLength == 0 && last.AcceptedSequence < request.Sequence) mayHaveWrittenText = false;
+            // 原生端的失焦拒绝和普通更新的范围不匹配都在 SetText 前返回。只信任未接受的零正文回复。
+            // 恢复命令、回复丢失以及任何曾经写入的会话都不能据此判为空。
+            if (!previouslyWritten && last.TextLength == 0 && last.AcceptedSequence < request.Sequence &&
+                (last.HResult == 1 && last.State == TsfCompositionState.FocusUnavailable ||
+                 command is (TsfCommand.Update or TsfCommand.Commit) && last.HResult == unchecked((int)0x8007051A) &&
+                 last.State == TsfCompositionState.Composing)) mayHaveWrittenText = false;
             if (command is TsfCommand.Commit or TsfCommand.RefineCommitted && last.HResult == 0 &&
                 last.State == TsfCompositionState.Committed && last.TextLength != text.Length)
                 throw new InvalidDataException("提交回复的正文长度不一致，未继续改写输入框。");
