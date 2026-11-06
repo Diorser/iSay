@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parent
 DIST = ROOT / 'dist'
 BASE = 'https://isay-voice.pages.dev'
 REPO = 'https://github.com/Diorser/iSay'
-UPDATED = '2026-11-03'
+UPDATED = '2026-11-06'
 RELEASE = json.loads((DIST / 'downloads/windows.json').read_text(encoding='utf-8-sig'))
 VERSION = RELEASE['version']
 AUTO_UPDATES = RELEASE.get('automaticUpdatesEnabled') is True

@@ -8,9 +8,9 @@ iSay brings multilingual voice input to your Windows desktop. Press Right Alt, s
 
 **Free forever · Built for Windows · Multilingual voice input**
 
-[**Download for Windows →**](https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe) · [Website](https://isay-voice.pages.dev/en/) · [Get started](#three-steps-from-speech-to-text) · [Feedback](https://github.com/Diorser/iSay/issues)
+[**Download for Windows →**](https://github.com/Diorser/iSay/releases/download/v0.10.9-installer-preview/iSay-0.10.9-win-x64-full.exe) · [Website](https://isay-voice.pages.dev/en/) · [Get started](#three-steps-from-speech-to-text) · [Feedback](https://github.com/Diorser/iSay/issues)
 
-Windows 10 / 11 · x64 · Installer preview 0.10.7 · Full installer: 192.29 MiB
+Windows 10 / 11 · x64 · Installer preview 0.10.9 · Full installer: 192.30 MiB
 
 ![iSay Windows voice input interface with recording controls, original transcript and refined text](./website/dist/assets/screenshots/voice-input.png)
 
@@ -31,7 +31,7 @@ Direct input support varies by application. Some input fields may require plain-
 
 ## Three steps from speech to text
 
-1. **Download and install.** Get the [complete Windows installer](https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe) and follow the setup wizard. The .NET and VC++ installers are included; you do not need to find them separately.
+1. **Download and install.** Get the [complete Windows installer](https://github.com/Diorser/iSay/releases/download/v0.10.9-installer-preview/iSay-0.10.9-win-x64-full.exe) and follow the setup wizard. The .NET and VC++ installers are included; you do not need to find them separately.
 2. **Choose your microphone.** Open iSay, confirm that Windows permits microphone access, and select your device.
 3. **Press Right Alt and speak.** Put the cursor in a supported input field, press once to start, and press again to finish. You can also review text in iSay and copy it to your destination.
 
@@ -85,13 +85,13 @@ Transcription history is stored locally for 30 days by default. Audio file savin
 
 ### Is the current release ready for unrestricted daily use?
 
-Version 0.10.7 is still a complete installer preview. Clean Windows 10 installation and real microphone recognition have not completed acceptance testing, so try your own microphone and usual apps first. The installer has no Windows publisher signature yet. See the [release status and checksums (Chinese)](./docs/公开/完整安装包发布说明.md).
+Version 0.10.9 is still a complete installer preview. Clean Windows 10 installation and real microphone recognition have not completed acceptance testing, so try your own microphone and usual apps first. The installer has no Windows publisher signature yet. See the [release status and checksums (Chinese)](./docs/公开/完整安装包发布说明.md).
 
 ### How do I get future updates?
 
 Starting with 0.10.6, automatic update checks are enabled by default. The first check runs 30–60 seconds after startup, then about every 12 hours. Open **Settings → About iSay** to check manually, download an update and choose when to install it. Updates are not installed automatically, and the app will not close without your choice. Finish recording and text refinement before installing.
 
-**If you use 0.10.5 or earlier, first install the current version manually from the website or [GitHub Releases](https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview) to join the update channel.** Existing personal settings and switch choices are preserved. You can also turn automatic checks off in About. See the [automatic-update guide (Chinese)](./docs/公开/自动更新使用与发布.md).
+**If you use 0.10.5 or earlier, first install the current version manually from the website or [GitHub Releases](https://github.com/Diorser/iSay/releases/tag/v0.10.9-installer-preview) to join the update channel.** Existing personal settings and switch choices are preserved. You can also turn automatic checks off in About. See the [automatic-update guide (Chinese)](./docs/公开/自动更新使用与发布.md).
 
 ### What if recording produces no text or an app is incompatible?
 
@@ -101,7 +101,7 @@ First use the recording button inside iSay and check your selected microphone, W
 
 If iSay fits your workflow, give the project a **Star** and share it with someone who wants to type less and express more. Found a problem or have an idea? [Tell us](https://github.com/Diorser/iSay/issues).
 
-[**Download for Windows →**](https://github.com/Diorser/iSay/releases/download/v0.10.7-installer-preview/iSay-0.10.7-win-x64-full.exe) · [Visit the website](https://isay-voice.pages.dev/en/) · [Release notes and SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview)
+[**Download for Windows →**](https://github.com/Diorser/iSay/releases/download/v0.10.9-installer-preview/iSay-0.10.9-win-x64-full.exe) · [Visit the website](https://isay-voice.pages.dev/en/) · [Release notes and SHA256](https://github.com/Diorser/iSay/releases/tag/v0.10.9-installer-preview)
 
 <details>
 <summary>Developers: builds, source and checks</summary>

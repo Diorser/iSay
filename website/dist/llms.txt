@@ -6,11 +6,11 @@
 - [Chinese product page](https://isay-voice.pages.dev/): features, populated real UI screenshots, free policy, setup and FAQ.
 - [English product page](https://isay-voice.pages.dev/en/): statically rendered English version.
 - [Product facts](https://isay-voice.pages.dev/product.json): version, platform, pricing scope, defaults, download and known limitations.
-- [Download and release notes](https://github.com/Diorser/iSay/releases/tag/v0.10.7-installer-preview): complete installer preview 0.10.7 and SHA256.
+- [Download and release notes](https://github.com/Diorser/iSay/releases/tag/v0.10.9-installer-preview): complete installer preview 0.10.9 and SHA256.
 - [Source and feedback](https://github.com/Diorser/iSay): own source code, issues and dependency notices.
 
 ## Product facts
-Maintainer: Diorser. Updated: 2026-11-03. Platform: Windows 10 2004+ and Windows 11, x64.
+Maintainer: Diorser. Updated: 2026-11-06. Platform: Windows 10 2004+ and Windows 11, x64.
 The iSay desktop app is permanently free. Optional third-party APIs may charge separately; upstream availability and quotas are not guaranteed by iSay.
 Features: multilingual voice input, RightAlt controls, text refinement with original transcript comparison, personal vocabulary, local history, floating recording bar, tray, playback muting, Chinese and English UI. Supported recognition languages depend on the selected speech service.
 History is local with 30-day default retention; audio saving is off by default. Online recognition/refinement may send required content to the selected service.
